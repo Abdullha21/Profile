@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>রাইডার হোম</title>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet"/>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Hind Siliguri', sans-serif;
+    }
+
+    body {
+      background: #f5f7fb;
+      color: #1a1a1a;
+      overflow-x: hidden;
+    }
+
+    header {
+      position: relative;
+      height: 350px;
+      background: linear-gradient(135deg, #1e3a8a, #3b82f6);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      border-bottom-left-radius: 50px;
+      border-bottom-right-radius: 50px;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+      animation: slideDown 1.2s ease-in-out;
+    }
+
+    header img {
+      max-height: 320px;
+      object-fit: contain;
+      filter: drop-shadow(0 10px 20px rgba(0, 0, 0, 0.3));
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 2.5rem;
+      margin: 30px 0 15px;
+      font-weight: 700;
+      color: #1e3a8a;
+      animation: fadeIn 1.5s ease-in;
+    }
+
+    .rider-section {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 30px;
+      padding: 40px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .rider-card {
+      background: #ffffff;
+      border-radius: 20px;
+      box-shadow: 0 12px 25px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+      width: 320px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      animation: popIn 1s ease;
+    }
+
+    .rider-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    }
+
+    .rider-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+    }
+
+    .rider-info {
+      padding: 20px;
+      text-align: center;
+    }
+
+    .rider-info h3 {
+      font-size: 1.5rem;
+      margin-bottom: 10px;
+      color: #1e3a8a;
+      font-weight: 600;
+    }
+
+    .rider-info p {
+      font-size: 1rem;
+      color: #4b5563;
+      line-height: 1.6;
+      margin-bottom: 15px;
+    }
+
+    .rider-info .profile-btn {
+      display: inline-block;
+      padding: 10px 20px;
+      background: #3b82f6;
+      color: #ffffff;
+      text-decoration: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: 600;
+      transition: background 0.3s ease, transform 0.2s ease;
+    }
+
+    .rider-info .profile-btn:hover {
+      background: #1e3a8a;
+      transform: scale(1.05);
+    }
+
+    footer {
+      text-align: center;
+      padding: 25px;
+      font-size: 0.9rem;
+      color: #6b7280;
+      background: #e5e7eb;
+      border-top: 1px solid #d1d5db;
+      margin-top: 50px;
+    }
+
+    @keyframes slideDown {
+      from { transform: translateY(-100px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    @keyframes popIn {
+      0% { transform: scale(0.85); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    @media (max-width: 768px) {
+      header img {
+        height: 250px;
+      }
+
+      h1 {
+        font-size: 2rem;
+      }
+
+      .rider-card {
+        width: 90%;
+      }
+    }
+
+    @media (max-width: 480px) {
+      header img {
+        height: 180px;
+      }
+
+      h1 {
+        font-size: 1.8rem;
+      }
+
+      .rider-section {
+        padding: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header / Banner -->
+  <header>
+    <img src="https://assets.onecompiler.app/42weeh2u8/43kr2dz7j/1000018847.png" alt="Rider with phone & bag"/>
+  </header>
+
+  <!-- Main Heading -->
+  <h1>আপনার বিশ্বস্ত রাইডার সার্ভিস</h1>
+
+  <!-- Rider Cards -->
+  <section class="rider-section">
+    <div class="rider-card">
+      <img class="rider-image" src="https://assets.onecompiler.app/42weeh2u8/43kr2dz7j/1000018846.jpg" alt="Rider Image" />
+      <div class="rider-info">
+        <h3>মিনহাজ</h3>
+        <p>🏍️ অভিজ্ঞতা: ১ বছর<br>📍 এলাকা: আছিম বাজার</p>
+        <a href="https://example.com/rider/minhaz" class="profile-btn">প্রোফাইল দেখুন</a>
+      </div>
+    </div>
+    <!-- Add more rider cards as needed -->
+  </section>
+
+  <!-- Footer -->
+  <footer>
+    © 2025 | DEV.MD ABDULLHA KHAN ❤️
+  </footer>
+</body>
+</html>
