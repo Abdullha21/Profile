@@ -2,72 +2,56 @@
 <html lang="bn">
 <head>
   <meta charset="UTF-8">
-  <title>ঈদের শুভেচ্ছা ২০২৫</title>
+  <title>ঈদ মোবারক ২০২৫</title>
   <style>
     body {
       margin: 0;
       padding: 0;
-      background: #0f0f0f;
       font-family: 'Noto Sans Bengali', sans-serif;
+      background: radial-gradient(circle, #0a0a0a 0%, #1f1f1f 100%);
+      color: #ffffff;
+      height: 100vh;
       display: flex;
       justify-content: center;
       align-items: center;
-      height: 100vh;
+      flex-direction: column;
       overflow: hidden;
     }
 
-    .container {
-      text-align: center;
-      color: white;
-    }
-
-    .animated-text {
-      font-size: 2rem;
+    .line {
+      font-size: 1.8rem;
       font-weight: bold;
-      display: inline-block;
-      white-space: nowrap;
+      margin: 15px 0;
+      opacity: 0;
+      transform: translateX(-100%);
+      animation: slideIn 1s ease forwards;
     }
 
-    .letter {
-      display: inline-block;
-      opacity: 0;
-      transform: translateX(-100px);
-      animation: slideIn 0.6s forwards;
-    }
+    .line:nth-child(1) { animation-delay: 0.5s; }
+    .line:nth-child(2) { animation-delay: 2s; }
+    .line:nth-child(3) { animation-delay: 3.5s; }
+    .line:nth-child(4) { animation-delay: 5s; }
+    .line:nth-child(5) { animation-delay: 6.5s; }
 
     @keyframes slideIn {
       to {
-        opacity: 1;
         transform: translateX(0);
+        opacity: 1;
       }
     }
-
-    .line {
-      margin: 20px 0;
-    }
-
-    .line:nth-child(1) .letter { animation-delay: calc(var(--i) * 0.05s); }
-    .line:nth-child(2) .letter { animation-delay: calc(var(--i) * 0.05s + 2s); }
-    .line:nth-child(3) .letter { animation-delay: calc(var(--i) * 0.05s + 4s); }
-    .line:nth-child(4) .letter { animation-delay: calc(var(--i) * 0.05s + 6s); }
-    .line:nth-child(5) .letter { animation-delay: calc(var(--i) * 0.05s + 8s); }
 
     .bkash-box {
       margin-top: 40px;
-      background: linear-gradient(45deg, #ff0055, #ff6600);
       padding: 20px;
+      background: linear-gradient(to right, #ff0066, #ff6600);
       border-radius: 15px;
-      display: inline-block;
-      color: #fff;
-      box-shadow: 0 0 25px rgba(255, 0, 85, 0.6);
-      animation: fadeIn 1.5s ease-in-out 10s forwards;
+      box-shadow: 0 0 25px rgba(255, 102, 0, 0.6);
       opacity: 0;
-    }
-
-    @keyframes fadeIn {
-      to {
-        opacity: 1;
-      }
+      transform: translateY(50px);
+      animation: fadeUp 1s ease forwards;
+      animation-delay: 8s;
+      color: white;
+      text-align: center;
     }
 
     .bkash-box h3 {
@@ -76,51 +60,29 @@
     }
 
     .bkash-number {
-      font-size: 1.8rem;
+      font-size: 1.6rem;
       font-weight: bold;
-      margin-top: 8px;
+      margin-top: 10px;
+    }
+
+    @keyframes fadeUp {
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <div class="line animated-text" id="line1"></div>
-    <div class="line animated-text" id="line2"></div>
-    <div class="line animated-text" id="line3"></div>
-    <div class="line animated-text" id="line4"></div>
-    <div class="line animated-text" id="line5"></div>
+  <div class="line">🌙 ঈদ মোবারক! আনন্দে ভরে উঠুক আপনার হৃদয়</div>
+  <div class="line">🐐 কোরবানির ঈদ হোক ত্যাগের মহিমায় আলোকিত</div>
+  <div class="line">❤️ প্রিয়জনের সাথে কাটুক শান্তিময় মুহূর্ত</div>
+  <div class="line">🤲 আল্লাহ আপনার কোরবানি কবুল করুন</div>
+  <div class="line">🎁 আর হ্যাঁ, ঈদের সালামি পাঠাতে ভুলবেন না!</div>
 
-    <div class="bkash-box">
-      <h3>ঈদের সালামি পাঠাতে চাইলে বিকাশ করুন 💸</h3>
-      <div class="bkash-number">01796693813</div>
-    </div>
+  <div class="bkash-box">
+    <h3>ঈদের সালামি পাঠানোর বিকাশ নাম্বারঃ</h3>
+    <div class="bkash-number">01XXXXXXXXX</div>
   </div>
-
-  <script>
-    const lines = [
-      "🌙 ঈদ মোবারক! আনন্দে ভরুক আপনার হৃদয়",
-      "🐐 কোরবানির ঈদে হোক ত্যাগের শিক্ষা হৃদয়ে",
-      "❤️ প্রিয়জনদের পাশে থাকুন ভালবাসায়",
-      "🤲 আল্লাহ্‌ আপনার কোরবানি কবুল করুন",
-      "🎁 আর হ্যাঁ... ঈদের সালামি পাঠাতে ভুলবেন না!"
-    ];
-
-    function animateLine(lineId, text) {
-      const lineDiv = document.getElementById(lineId);
-      text.split('').forEach((char, idx) => {
-        const span = document.createElement('span');
-        span.classList.add('letter');
-        span.style.setProperty('--i', idx);
-        span.textContent = char;
-        lineDiv.appendChild(span);
-      });
-    }
-
-    animateLine("line1", lines[0]);
-    animateLine("line2", lines[1]);
-    animateLine("line3", lines[2]);
-    animateLine("line4", lines[3]);
-    animateLine("line5", lines[4]);
-  </script>
 </body>
 </html>
