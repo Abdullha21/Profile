@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <title>Bachelor boy and season 5- video Gallery</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      margin: 0;
+      background: linear-gradient(to bottom, #000000, #1a1a1a);
+      font-family: 'Segoe UI', Tahoma, sans-serif;
+      color: #fff;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 30px;
+    }
+
+    .video-box {
+      position: relative;
+      background-color: #000;
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+    }
+
+    .video-title {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: rgba(0, 0, 0, 0.7);
+      color: #fff;
+      padding: 10px 16px;
+      font-size: 18px;
+      font-weight: bold;
+      z-index: 2;
+    }
+
+    .video-thumb {
+      width: 100%;
+      display: block;
+      cursor: pointer;
+    }
+
+    .play-button {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: rgba(255,255,255,0.8);
+      border-radius: 50%;
+      width: 70px;
+      height: 70px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+
+    .play-button:hover {
+      background: red;
+      transform: translate(-50%, -50%) scale(1.1);
+    }
+
+    .play-button::before {
+      content: '▶';
+      font-size: 30px;
+      color: #000;
+    }
+
+    video {
+      display: none;
+      width: 100%;
+      height: auto;
+    }
+  </style>
+</head>
+<body>
+
+<h1>🔥 Bachelor point season 5- video Gallery</h1>
+
+<div class="video-grid">
+
+  <!-- Video 1 -->
+  <div class="video-box">
+    <div class="video-title"> Episode 1- FUL HD</div>
+    <img class="video-thumb" src="https://assets.onecompiler.app/42weeh2u8/43m7ykxug/1000019151.jpg" alt="Thumbnail">
+    <div class="play-button"></div>
+    <video controls playsinline>
+      <source src="https://files.catbox.moe/1nfbfx.mp4" type="video/mp4">
+      আপনার ব্রাউজার ভিডিও চালাতে পারছে না।
+    </video>
+  </div>
+
+  <!-- Video 2 -->
+  <div class="video-box">
+    <div class="video-title"> Episode 2- FUL HD</div>
+    <img class="video-thumb" src="https://assets.onecompiler.app/42weeh2u8/43m7ykxug/1000019151.jpg" alt="Thumbnail">
+    <div class="play-button"></div>
+    <video controls playsinline>
+      <source src="https://files.catbox.moe/qhcbyn.mp4" type="video/mp4">
+      আপনার ব্রাউজার ভিডিও চালাতে পারছে না।
+    </video>
+  </div>
+
+  <!-- আরও ভিডিও চাইলে এখানে কপি-পেস্ট করুন -->
+  
+</div>
+
+<script>
+  document.querySelectorAll('.video-box').forEach(box => {
+    const thumb = box.querySelector('.video-thumb');
+    const playBtn = box.querySelector('.play-button');
+    const video = box.querySelector('video');
+
+    playBtn.addEventListener('click', () => {
+      thumb.style.display = 'none';
+      playBtn.style.display = 'none';
+      video.style.display = 'block';
+      video.play();
+    });
+  });
+</script>
+
+</body>
+</html>
