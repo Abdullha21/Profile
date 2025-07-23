@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Skull Breaker Force - SBF</title>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Bebas Neue', sans-serif;
+    }
+
+    body {
+      background: linear-gradient(135deg, #0d0d0d, #1a1a1a);
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    /* Header Styling */
+    header {
+      text-align: center;
+      padding: 60px 20px;
+      background: linear-gradient(180deg, #1a1a1a, #0d0d0d);
+      position: relative;
+      overflow: hidden;
+    }
+
+    header img {
+      max-width: 180px;
+      filter: drop-shadow(0 0 15px #ff3c00);
+      animation: pulse 2s infinite ease-in-out;
+    }
+
+    header h1 {
+      font-size: 60px;
+      color: #ff3c00;
+      text-shadow: 0 0 10px #ff3c00, 0 0 20px #ff3c00aa;
+      margin-top: 15px;
+      animation: fadeInDown 1s ease-out;
+    }
+
+    header p {
+      font-size: 22px;
+      color: #ccc;
+      animation: fadeInUp 1.2s ease-out;
+    }
+
+    /* Team Section */
+    .team {
+      padding: 60px 20px;
+      background: linear-gradient(135deg, #141414, #1f1f1f);
+    }
+
+    .team h2 {
+      text-align: center;
+      font-size: 40px;
+      color: #ff3c00;
+      text-shadow: 0 0 10px #ff3c00;
+      margin-bottom: 40px;
+      animation: fadeIn 1s ease-out;
+    }
+
+    .players {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 25px;
+      text-align: center;
+    }
+
+    .player {
+      background: #222;
+      padding: 25px;
+      border-radius: 15px;
+      box-shadow: 0 0 15px #ff3c00aa;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .player:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 0 25px #ff3c00cc;
+    }
+
+    .player::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255, 60, 0, 0.2), transparent);
+      transition: 0.5s;
+    }
+
+    .player:hover::before {
+      left: 100%;
+    }
+
+    .player h3 {
+      font-size: 28px;
+      color: #fff;
+      text-shadow: 0 0 5px #fff;
+    }
+
+    .player p {
+      font-size: 18px;
+      color: #ff3c00;
+    }
+
+    /* About Section */
+    .about {
+      padding: 60px 20px;
+      background: linear-gradient(135deg, #1f1f1f, #141414);
+      text-align: center;
+    }
+
+    .about h2 {
+      color: #ff3c00;
+      font-size: 40px;
+      text-shadow: 0 0 10px #ff3c00;
+      margin-bottom: 25px;
+      animation: fadeIn 1s ease-out;
+    }
+
+    .about p {
+      font-size: 20px;
+      max-width: 800px;
+      margin: auto;
+      color: #ccc;
+      line-height: 1.6;
+      animation: fadeInUp 1.2s ease-out;
+    }
+
+    /* Footer Styling */
+    footer {
+      background: #111;
+      padding: 30px;
+      text-align: center;
+      border-top: 2px solid #ff3c00;
+    }
+
+    footer a {
+      margin: 0 15px;
+      color: #ff3c00;
+      font-size: 28px;
+      text-decoration: none;
+      transition: color 0.3s ease, transform 0.3s ease;
+    }
+
+    footer a:hover {
+      color: #fff;
+      transform: scale(1.2);
+      text-shadow: 0 0 10px #ff3c00;
+    }
+
+    /* Animations */
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+
+    @keyframes fadeIn {
+      0% { opacity: 0; }
+      100% { opacity: 1; }
+    }
+
+    @keyframes fadeInDown {
+      0% { opacity: 0; transform: translateY(-20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeInUp {
+      0% { opacity: 0; transform: translateY(20px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Responsive Design */
+    @media (max-width: 768px) {
+      header h1 { font-size: 40px; }
+      header p { font-size: 18px; }
+      .team h2, .about h2 { font-size: 32px; }
+      .player h3 { font-size: 24px; }
+      .player p { font-size: 16px; }
+      .about p { font-size: 18px; }
+    }
+
+    @media (max-width: 480px) {
+      header img { max-width: 120px; }
+      header h1 { font-size: 32px; }
+      header p { font-size: 16px; }
+      .team h2, .about h2 { font-size: 28px; }
+      .players { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="https://uploads.onecompiler.io/42weeh2u8/43rhab5pa/1000022167.jpg" alt="SBF Logo">
+    <h1>Skull Breaker Force</h1>
+    <p>The Ultimate Bangladeshi eSports Squad</p>
+  </header>
+
+  <section class="team">
+    <h2>Our Team</h2>
+    <div class="players">
+      <div class="player">
+        <h3>ABDULLAH</h3>
+        <p>Leader & Backup</p>
+      </div>
+      <div class="player">
+        <h3>FORHAD</h3>
+        <p>Rush & Support</p>
+      </div>
+      <div class="player">
+        <h3>RATIN</h3>
+        <p>Cover & Rush</p>
+      </div>
+      <div class="player">
+        <h3>JUBAYER</h3>
+        <p>Push & Receiver</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="about">
+    <h2>About SBF</h2>
+    <p>
+      SBF (Skull Breaker Force) is a rising Free Fire eSports team from Bangladesh. Our squad is all about teamwork, skills,
+      and unstoppable aggression on the battleground. Join us as we break limits and dominate the arena.
+    </p>
+  </section>
+
+  <footer>
+    <a href="h">📱 Telegram</a>
+    <a href="8/.png">📺 YouTube</a>
+    <a href="hng">📸 YOUTUBE</a>
+  </footer>
+</body>
+</html>
