@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="bn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Email Generator — Instant</title>
+  <meta name="description" content="Generate Gmail dot-variants and plus-addresses — instant, professional single-file generator." />
+  <style>
+    :root{ --bg:#000; --card:#0b0b0b; --glass:rgba(255,255,255,0.02); --muted:#9aa0a6; --accent:#1a73e8; --accent-2:#34c759; --text:#e6e6e6; --danger:#ff6b6b; --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, 'Roboto Mono', 'Courier New', monospace; }
+    html,body{height:100%;margin:0;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,Helvetica,Arial; background:var(--bg); color:var(--text);}
+    .wrap{max-width:980px;margin:18px auto;padding:18px;}
+    .card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:14px;padding:18px;box-shadow:0 10px 40px rgba(0,0,0,0.6);opacity:0;transform:translateY(8px);animation:fadeInUp .45s ease forwards}
+    @keyframes fadeInUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+    h1{margin:0;font-size:20px;display:flex;align-items:center;gap:10px}
+    .pulse{width:10px;height:10px;border-radius:50%;background:var(--accent);box-shadow:0 0 0 rgba(26,115,232,0.6);animation:ping 1.6s infinite}
+    @keyframes ping{0%{box-shadow:0 0 0 0 rgba(26,115,232,0.6)}70%{box-shadow:0 0 0 10px rgba(26,115,232,0)}100%{box-shadow:0 0 0 0 rgba(26,115,232,0)}}
+    p.lead{margin:8px 0 14px;color:var(--muted);font-size:13px}
+
+    .grid{display:grid;grid-template-columns:1fr 360px;gap:14px}
+    @media (max-width:900px){.grid{grid-template-columns:1fr}}
+
+    label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+    input[type=text], select, textarea{width:100%;padding:10px 12px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:var(--glass);color:var(--text);font-size:14px}
+    .row{display:flex;gap:8px}
+    button{background:var(--accent);color:white;border:0;padding:10px 12px;border-radius:10px;font-weight:700;cursor:pointer;transition:transform .12s ease, box-shadow .12s ease}
+    button:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(26,115,232,0.12)}
+    button.ghost{background:transparent;border:1px solid rgba(255,255,255,0.04)}
+    button.small{padding:8px 10px;font-size:13px}
+
+    .panel{background:rgba(255,255,255,0.01);padding:12px;border-radius:10px}
+    .output{max-height:520px;overflow:auto;border-radius:10px;padding:8px;margin-top:10px;border:1px dashed rgba(255,255,255,0.03);background:linear-gradient(180deg, rgba(255,255,255,0.005), rgba(255,255,255,0.01));}
+    .item{display:flex;justify-content:space-between;align-items:center;padding:8px 10px;border-radius:8px;margin-bottom:6px;background:rgba(255,255,255,0.01);font-family:var(--mono);font-size:13px}
+    .meta{color:var(--muted);font-size:12px;margin-top:8px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+    .stat{color:var(--muted);font-size:13px}
+    .danger{color:var(--danger)}
+    .footer{margin-top:14px;color:var(--muted);font-size:13px;display:flex;justify-content:space-between;align-items:center}
+    .badge{display:inline-block;padding:6px 8px;border-radius:8px;background:rgba(255,255,255,0.02);font-size:12px}
+
+    .logo{display:flex;align-items:center;gap:10px}
+    .logo img{width:34px;height:34px;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,0.5)}
+
+    .fadeIn{animation:fadeIn .5s ease both}
+    @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+    @media (max-width:480px){h1{font-size:18px}}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:12px;">
+        <div>
+          <h1><span class="pulse" aria-hidden></span>Email Generator — Instant</h1>
+          <p class="lead">তুমি যেই Gmail ঠিকানাটা দাও — তা থেকে দ্রুত ও সেফভাবে dot-ভ্যারিয়েন্ট ও +tag ভ্যারিয়েন্ট তৈরি করে নাও। কপি-বাটন, একসাথে কপি, এবং CSV/TXT ডাউনলোড রয়েছে।</p>
+        </div>
+        <div class="logo">
+          <img src="data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='64' height='64'><rect rx='12' width='64' height='64' fill='%231a73e8'/><text x='50%' y='54%' font-size='28' text-anchor='middle' fill='white' font-family='Arial' font-weight='700'>G</text></svg>" alt="logo">
+        </div>
+      </div>
+
+      <div class="grid" style="margin-top:12px">
+        <div>
+          <div class="panel">
+            <label>Gmail ঠিকানা (উদাহরণ: example@gmail.com)</label>
+            <input id="emailInput" type="text" placeholder="yourname@gmail.com" />
+
+            <div style="height:10px"></div>
+
+            <label>জেনারেশন মোড</label>
+            <select id="modeSelect">
+              <option value="all">All combinations (exponential)</option>
+              <option value="every">Insert dot every N characters</option>
+              <option value="pattern">Repeat pattern (comma separated, e.g. 1,2,1)</option>
+            </select>
+
+            <div id="modeParams" style="margin-top:10px"></div>
+
+            <div style="height:10px"></div>
+
+            <label>Extra options</label>
+            <div class="row" style="margin-bottom:8px">
+              <label style="flex:1"><input id="plusAddr" type="checkbox" /> Generate +tag variants (adds +1..+5)</label>
+            </div>
+            <div class="row" style="margin-bottom:8px">
+              <label style="flex:1">Max local length (for All mode)</label>
+              <input id="maxLen" type="text" value="12" />
+            </div>
+
+            <div style="height:10px"></div>
+
+            <label>Developer Telegram username (will appear in footer)</label>
+            <input id="telegramInput" type="text" value="Abdullah" placeholder="YourTelegramUser" />
+
+            <div style="height:8px"></div>
+
+            <div class="row" style="margin-top:10px">
+              <button id="genBtn">Generate</button>
+              <button id="clearBtn" class="ghost small">Clear</button>
+            </div>
+
+            <div class="meta">Tip: "All combinations" grows as 2^(n-1). Use it only for short names (n ≤ 12 recommended).</div>
+          </div>
+
+          <div class="footer">
+            <div class="badge">Instant • Professional</div>
+            <div class="meta">Animations added • Mobile-ready</div>
+          </div>
+        </div>
+
+        <div>
+          <div class="panel">
+            <div class="controls">
+              <button id="copyAll" class="small ghost">Copy All</button>
+              <button id="downloadTxt" class="small">Download TXT</button>
+              <button id="downloadCsv" class="small ghost">Download CSV</button>
+              <div style="flex:1"></div>
+              <div class="stat">Variants: <span id="countStat">0</span></div>
+            </div>
+
+            <div id="output" class="output" aria-live="polite"></div>
+          </div>
+
+          <div style="height:12px"></div>
+
+          <div class="panel" id="previewPanel">
+            <div class="meta">Preview: copy individual addresses using the right-side button. The tool ensures emails are generated with the correct domain and copies the full address (local@domain).</div>
+          </div>
+
+          <div style="height:10px"></div>
+
+          <div class="panel" id="footerPanel" style="margin-top:8px;display:flex;align-items:center;justify-content:space-between;gap:8px">
+            <div id="devText" class="meta">Developer: Abdullah Khan</div>
+            <a id="telegramLink" class="badge" href="https://t.me/Abdullah" target="_blank" rel="noopener noreferrer" title="Message Abdullah on Telegram">Telegram</a>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+(function(){
+  const emailInput = document.getElementById('emailInput');
+  const modeSelect = document.getElementById('modeSelect');
+  const modeParams = document.getElementById('modeParams');
+  const genBtn = document.getElementById('genBtn');
+  const clearBtn = document.getElementById('clearBtn');
+  const output = document.getElementById('output');
+  const countStat = document.getElementById('countStat');
+  const copyAll = document.getElementById('copyAll');
+  const downloadTxt = document.getElementById('downloadTxt');
+  const downloadCsv = document.getElementById('downloadCsv');
+  const plusAddrCheckbox = document.getElementById('plusAddr');
+  const maxLenInput = document.getElementById('maxLen');
+  const telegramInput = document.getElementById('telegramInput');
+  const devText = document.getElementById('devText');
+  const telegramLink = document.getElementById('telegramLink');
+
+  let lastDomain = 'gmail.com';
+
+  function isGmail(domain){ domain = domain.toLowerCase(); return domain === 'gmail.com' || domain === 'googlemail.com'; }
+  function sanitizeLocal(s){ return s.replace(/\s+/g,'').replace(/\./g,''); }
+
+  function generateAll(local){ const n = local.length; if(n<=1) return [local]; const slots = n-1; const total = 1<<slots; const out = []; for(let mask=0; mask<total; mask++){ let s=''; for(let i=0;i<n;i++){ s += local[i]; if(i<n-1){ if(mask & (1<<i)) s += '.'; } } out.push(s); } return out; }
+  function generateEveryN(local, N){ if(N<=0) return [local]; const parts = []; let i=0; while(i < local.length){ parts.push(local.slice(i, i+N)); i += N; } return [parts.join('.')]; }
+  function generatePattern(local, patternArr){ const out = []; if(patternArr.length === 0) return [local]; let i = 0; const parts = []; let patIdx = 0; while(i < local.length){ const take = Math.max(1, patternArr[patIdx % patternArr.length]); parts.push(local.slice(i, i+take)); i += take; patIdx++; } out.push(parts.join('.')); return out; }
+  function uniq(arr){ return Array.from(new Set(arr)); }
+
+  function renderList(arr, domain){ output.innerHTML = ''; const frag = document.createDocumentFragment(); arr.forEach(item => { const row = document.createElement('div'); row.className = 'item fadeIn'; const left = document.createElement('div'); left.textContent = item + '@' + domain; const right = document.createElement('div'); const copyBtn = document.createElement('button'); copyBtn.className='small ghost'; copyBtn.textContent='Copy'; copyBtn.addEventListener('click', ()=>{ const full = item + '@' + domain; navigator.clipboard.writeText(full).then(()=>{ copyBtn.textContent='Copied ✓'; setTimeout(()=>copyBtn.textContent='Copy',900); }).catch(()=>{ copyBtn.textContent='Failed'; setTimeout(()=>copyBtn.textContent='Copy',900); }); }); right.appendChild(copyBtn); row.appendChild(left); row.appendChild(right); frag.appendChild(row); }); output.appendChild(frag); countStat.textContent = arr.length; }
+
+  function showError(msg){ output.innerHTML = '<div class=\"item\" style=\"color:var(--danger)\">'+msg+'</div>'; countStat.textContent=0; }
+
+  function buildModeUI(){ modeParams.innerHTML = ''; if(modeSelect.value === 'every'){ const label = document.createElement('label'); label.textContent = 'N (insert dot every N characters)'; const input = document.createElement('input'); input.type='text'; input.id='everyN'; input.value='1'; modeParams.appendChild(label); modeParams.appendChild(input); } else if(modeSelect.value === 'pattern'){ const label = document.createElement('label'); label.textContent = 'Pattern (comma separated numbers, e.g. 1,2,1)'; const input = document.createElement('input'); input.type='text'; input.id='patternInput'; input.placeholder='1,2,1'; input.value='1,2,1'; modeParams.appendChild(label); modeParams.appendChild(input); } else { const p = document.createElement('div'); p.className='meta'; p.textContent='All combinations will create every possible dot placement between characters (use only for short names).'; modeParams.appendChild(p); } }
+
+  buildModeUI(); modeSelect.addEventListener('change', buildModeUI);
+
+  genBtn.addEventListener('click', ()=>{
+    const raw = emailInput.value.trim(); if(!raw){ showError('Please enter a Gmail address.'); return; }
+    const at = raw.indexOf('@'); if(at === -1){ showError('Email must contain @'); return; }
+    const localRaw = raw.slice(0, at);
+    const domainRaw = raw.slice(at+1).toLowerCase();
+    if(!isGmail(domainRaw)){ showError('This tool supports only gmail.com / googlemail.com domains.'); return; }
+    lastDomain = domainRaw;
+    const local = sanitizeLocal(localRaw);
+    if(local.length === 0){ showError('Local part is empty after removing dots.'); return; }
+    const mode = modeSelect.value;
+    const maxLen = parseInt(maxLenInput.value) || 12;
+    if(local.length > maxLen && mode === 'all'){ showError('Local part too long for All mode. Increase Max local length or choose another mode.'); return; }
+
+    let variants = [];
+    if(mode === 'all'){
+      variants = generateAll(local);
+    } else if(mode === 'every'){
+      const nI = document.getElementById('everyN'); let N = parseInt(nI && nI.value) || 1; if(N < 1) N = 1; variants = generateEveryN(local, N);
+    } else if(mode === 'pattern'){
+      const pI = document.getElementById('patternInput'); const rawPat = (pI && pI.value) || '1'; const parts = rawPat.split(',').map(x=>parseInt(x.trim())).filter(x=>!isNaN(x) && x>0); if(parts.length === 0){ showError('Invalid pattern. Use numbers like 1,2,1'); return; } variants = generatePattern(local, parts);
+    }
+
+    let final = [];
+    if(plusAddrCheckbox.checked){ variants.forEach(v => { final.push(v); for(let i=1;i<=5;i++) final.push(v + '+' + i); }); } else { final = variants.slice(); }
+    final = uniq(final);
+    renderList(final, lastDomain);
+
+    // update footer telegram link based on input
+    const tg = (telegramInput.value || '').trim(); if(tg.length>0){ telegramLink.href = 'https://t.me/' + encodeURIComponent(tg); telegramLink.title = 'Message ' + tg + ' on Telegram'; devText.textContent = 'Developer: Abdullah Khan'; }
+  });
+
+  clearBtn.addEventListener('click', ()=>{ emailInput.value=''; output.innerHTML=''; countStat.textContent=0; });
+
+  copyAll.addEventListener('click', async ()=>{
+    const items = Array.from(output.querySelectorAll('.item')).map(el => el.firstChild.textContent);
+    if(items.length === 0) return;
+    const text = items.join('\n');
+    try{ await navigator.clipboard.writeText(text); copyAll.textContent='Copied ✓'; setTimeout(()=>copyAll.textContent='Copy All',1000);}catch(e){ copyAll.textContent='Failed'; setTimeout(()=>copyAll.textContent='Copy All',1000); }
+  });
+
+  downloadTxt.addEventListener('click', ()=>{
+    const items = Array.from(output.querySelectorAll('.item')).map(el => el.firstChild.textContent);
+    if(items.length === 0) return; const text = items.join('\n'); const blob = new Blob([text], {type:'text/plain;charset=utf-8'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'gmail-dot-variants.txt'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  });
+
+  downloadCsv.addEventListener('click', ()=>{
+    const items = Array.from(output.querySelectorAll('.item')).map(el => el.firstChild.textContent);
+    if(items.length === 0) return; const csv = 'email\n' + items.join('\n'); const blob = new Blob([csv], {type:'text/csv;charset=utf-8'}); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'gmail-dot-variants.csv'; document.body.appendChild(a); a.click(); a.remove(); URL.revokeObjectURL(url);
+  });
+
+  emailInput.addEventListener('keydown', (e)=>{ if(e.key === 'Enter') genBtn.click(); });
+
+  (function initFooter(){ const tg = (telegramInput.value || '').trim(); if(tg) telegramLink.href = 'https://t.me/' + encodeURIComponent(tg); })();
+
+})();
+</script>
+</body>
+</html>
