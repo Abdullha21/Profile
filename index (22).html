@@ -1,195 +1,163 @@
 <!DOCTYPE html>
-<html lang="bn">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
-  <title>Bachelor point season 5- video Gallery</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Alam Reminder</title>
   <style>
     body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: linear-gradient(135deg, #667eea, #764ba2);
+      color: #fff;
       margin: 0;
-      background: linear-gradient(to bottom, #000000, #1a1a1a);
-      font-family: 'Segoe UI', Tahoma, sans-serif;
-      color: #fff;
-      padding: 20px;
-    }
-
-    h1 {
-      text-align: center;
-      margin-bottom: 30px;
-    }
-
-    .video-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-      gap: 30px;
-    }
-
-    .video-box {
-      position: relative;
-      background-color: #000;
-      border-radius: 16px;
-      overflow: hidden;
-      box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
-    }
-
-    .video-title {
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      background: rgba(0, 0, 0, 0.7);
-      color: #fff;
-      padding: 10px 16px;
-      font-size: 18px;
-      font-weight: bold;
-      z-index: 2;
-    }
-
-    .video-thumb {
-      width: 100%;
-      display: block;
-      cursor: pointer;
-    }
-
-    .play-button {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      background: rgba(255,255,255,0.8);
-      border-radius: 50%;
-      width: 70px;
-      height: 70px;
+      padding: 0;
       display: flex;
       justify-content: center;
-      align-items: center;
-      z-index: 2;
-      cursor: pointer;
-      transition: 0.3s;
+      align-items: flex-start;
+      min-height: 100vh;
     }
-
-    .play-button:hover {
-      background: red;
-      transform: translate(-50%, -50%) scale(1.1);
+    .container {
+      background: rgba(255, 255, 255, 0.1);
+      padding: 30px;
+      margin-top: 40px;
+      border-radius: 15px;
+      width: 90%;
+      max-width: 450px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+      text-align: center;
     }
-
-    .play-button::before {
-      content: '▶';
-      font-size: 30px;
-      color: #000;
+    h2 {
+      margin-bottom: 20px;
+      font-size: 28px;
+      font-weight: 600;
     }
-
-    video {
-      display: none;
+    input, textarea, button {
       width: 100%;
-      height: auto;
+      padding: 12px;
+      margin: 10px 0;
+      font-size: 16px;
+      border-radius: 8px;
+      border: none;
+      outline: none;
+    }
+    input, textarea {
+      background: rgba(255, 255, 255, 0.2);
+      color: #fff;
+    }
+    textarea::placeholder, input::placeholder {
+      color: #ddd;
+    }
+    button {
+      background: #4CAF50;
+      color: white;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: bold;
+      transition: background 0.3s ease;
+    }
+    button:hover {
+      background: #3e9c44;
+    }
+    .history {
+      margin-top: 25px;
+      text-align: left;
+    }
+    .history h3 {
+      font-size: 22px;
+      margin-bottom: 10px;
+      border-bottom: 1px solid rgba(255,255,255,0.2);
+      padding-bottom: 5px;
+    }
+    .history-item {
+      background: rgba(255, 255, 255, 0.15);
+      padding: 10px;
+      border-radius: 8px;
+      margin-bottom: 8px;
+      font-size: 15px;
+    }
+    .time {
+      font-weight: bold;
+      color: #ffd700;
+    }
+    .msg {
+      display: block;
+      margin-top: 3px;
+      color: #e0e0e0;
     }
   </style>
 </head>
 <body>
+  <div class="container">
+    <h2>⏰ Alam Reminder</h2>
+    <input type="time" id="timeInput" placeholder="Select time">
+    <textarea id="messageInput" placeholder="Write reason..."></textarea>
+    <button onclick="setNotification()">Set Notification</button>
 
-<h1>🔥 Bachelor point season 5- all episode</h1>
-
-<div class="video-grid">
-
-  <!-- Video 1 -->
-  <div class="video-box">
-    <div class="video-title"> Episode 1- FUL HD</div>
-    <img class="video-thumb" src="https://assets.onecompiler.app/42weeh2u8/43m7ykxug/1000019151.jpg" alt="Thumbnail">
-    <div class="play-button"></div>
-    <video controls playsinline>
-      <source src="https://files.catbox.moe/1nfbfx.mp4" type="video/mp4">
-      আপনার ব্রাউজার ভিডিও চালাতে পারছে না।
-    </video>
+    <div class="history">
+      <h3>📜 Notification History</h3>
+      <div id="historyList"></div>
+    </div>
   </div>
 
-  <!-- Video 2 -->
-  <div class="video-box">
-    <div class="video-title"> Episode 2- FUL HD</div>
-    <img class="video-thumb" src="https://assets.onecompiler.app/42weeh2u8/43m7ykxug/1000019151.jpg" alt="Thumbnail">
-    <div class="play-button"></div>
-    <video controls playsinline>
-      <source src="https://files.catbox.moe/qhcbyn.mp4" type="video/mp4">
-      আপনার ব্রাউজার ভিডিও চালাতে পারছে না।
-    </video>
-  </div>
-  <!-- Video 3 -->
-  <div class="video-box">
-    <div class="video-title"> Episode 3- FUL HD</div>
-    <img class="video-thumb" src="https://assets.onecompiler.app/42weeh2u8/43m7ykxug/1000019151.jpg" alt="Thumbnail">
-    <div class="play-button"></div>
-    <video controls playsinline>
-      <source src="https://files.catbox.moe/wg979p.mp4" type="video/mp4">
-      আপনার ব্রাউজার ভিডিও চালাতে পারছে না।
-    </video>
-  </div>
-  <!-- Video 4 -->
-  <div class="video-box">
-    <div class="video-title"> Episode 4- FUL HD</div>
-    <img class="video-thumb" src="https://assets.onecompiler.app/42weeh2u8/43m7ykxug/1000019151.jpg" alt="Thumbnail">
-    <div class="play-button"></div>
-    <video controls playsinline>
-      <source src="https://files.catbox.moe/xfu5hh.mp4" type="video/mp4">
-      আপনার ব্রাউজার ভিডিও চালাতে পারছে না।
-    </video>
-  </div>
-  <!-- Video 5 -->
-  <div class="video-box">
-    <div class="video-title"> Episode 5- FUL HD</div>
-    <img class="video-thumb" src="https://assets.onecompiler.app/42weeh2u8/43m7ykxug/1000019151.jpg" alt="Thumbnail">
-    <div class="play-button"></div>
-    <video controls playsinline>
-      <source src="https://files.catbox.moe/8bybjw.mp4" type="video/mp4">
-      আপনার ব্রাউজার ভিডিও চালাতে পারছে না।
-    </video>
-  </div>
-  <!-- Video 6 -->
-  <div class="video-box">
-    <div class="video-title"> Episode 6- FUL HD</div>
-    <img class="video-thumb" src="https://assets.onecompiler.app/42weeh2u8/43m7ykxug/1000019151.jpg" alt="Thumbnail">
-    <div class="play-button"></div>
-    <video controls playsinline>
-      <source src="https://files.catbox.moe/lfi5st.mp4" type="video/mp4">
-      আপনার ব্রাউজার ভিডিও চালাতে পারছে না।
-    </video>
-  </div>
-  <!-- Video 7 -->
-  <div class="video-box">
-    <div class="video-title"> Episode 7- FUL HD</div>
-    <img class="video-thumb" src="https://assets.onecompiler.app/42weeh2u8/43m7ykxug/1000019151.jpg" alt="Thumbnail">
-    <div class="play-button"></div>
-    <video controls playsinline>
-      <source src="https://files.catbox.moe/2jv9w0.mp4" type="video/mp4">
-      আপনার ব্রাউজার ভিডিও চালাতে পারছে না।
-    </video>
-  </div>
-  <!-- Video 8 -->
-  <div class="video-box">
-    <div class="video-title"> Episode 8- FUL HD</div>
-    <img class="video-thumb" src="https://assets.onecompiler.app/42weeh2u8/43m7ykxug/1000019151.jpg" alt="Thumbnail">
-    <div class="play-button"></div>
-    <video controls playsinline>
-      <source src="https://files.catbox.moe/jftcqz.mp4" type="video/mp4">
-      আপনার ব্রাউজার ভিডিও চালাতে পারছে না।
-    </video>
-  </div>
-  
-</div>
+  <!-- hidden audio for sound -->
+  <audio id="notifSound" src="https://actions.google.com/sounds/v1/alarms/alarm_clock.ogg" preload="auto"></audio>
 
-<script>
-  document.querySelectorAll('.video-box').forEach(box => {
-    const thumb = box.querySelector('.video-thumb');
-    const playBtn = box.querySelector('.play-button');
-    const video = box.querySelector('video');
+  <script>
+    // Ask for notification permission
+    if (Notification.permission !== "granted") {
+      Notification.requestPermission();
+    }
 
-    playBtn.addEventListener('click', () => {
-      thumb.style.display = 'none';
-      playBtn.style.display = 'none';
-      video.style.display = 'block';
-      video.play();
-    });
-  });
-</script>
+    const historyList = document.getElementById("historyList");
+    const notifSound = document.getElementById("notifSound");
 
+    function addToHistory(time, message) {
+      const div = document.createElement("div");
+      div.classList.add("history-item");
+      div.innerHTML = `<span class="time">Time: ${time}</span>
+                       <span class="msg">Note: ${message}</span>`;
+      historyList.prepend(div);
+    }
+
+    function setNotification() {
+      const timeValue = document.getElementById("timeInput").value;
+      const userMessage = document.getElementById("messageInput").value;
+
+      if (!timeValue || !userMessage) {
+        alert("Please select time & write reason!");
+        return;
+      }
+
+      const now = new Date();
+      const [hour, minute] = timeValue.split(":");
+      const targetTime = new Date();
+      targetTime.setHours(hour);
+      targetTime.setMinutes(minute);
+      targetTime.setSeconds(0);
+
+      let delay = targetTime - now;
+      if (delay < 0) {
+        alert("Time already passed today! Please choose future time.");
+        return;
+      }
+
+      addToHistory(timeValue, userMessage);
+
+      setTimeout(() => {
+        // play sound
+        notifSound.play().catch(()=>{});
+        // show notification
+        new Notification("⏰ Reminder!", {
+          body: `Time: ${timeValue}\nNote: ${userMessage}`,
+          icon: "https://cdn-icons-png.flaticon.com/512/1827/1827272.png"
+        });
+        // also alert on page
+        alert("⏰ Reminder: " + userMessage);
+      }, delay);
+
+      document.getElementById("timeInput").value = "";
+      document.getElementById("messageInput").value = "";
+    }
+  </script>
 </body>
 </html>
