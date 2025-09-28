@@ -1,73 +1,40 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Willow AQ Player</title>
-<script src="https://cdn.dashjs.org/latest/dash.all.min.js"></script>
-<style>
-  body{
-    background:#000;
-    color:#fff;
-    font-family:sans-serif;
-    text-align:center;
-    margin:0;
-    padding:0;
-  }
-  video{
-    width:90%;
-    max-width:960px;
-    height:auto;
-    margin-top:20px;
-    background:#000;
-    border-radius:8px;
-  }
-  .server-btn{
-    background:#FF3B3B;
-    color:#fff;
-    border:none;
-    padding:10px 16px;
-    font-size:16px;
-    border-radius:6px;
-    cursor:pointer;
-    margin-top:20px;
-  }
-</style>
+  <meta charset="utf-8">
+  <title>Live Stream</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.5/shaka-player.compiled.js"></script>
 </head>
 <body>
+  <video id="video" width="100%" height="auto" controls autoplay></video>
 
-<h2>India vs Pakistan — Willow AQ</h2>
+  <script>
+    document.addEventListener('DOMContentLoaded', async () => {
+      if (shaka.Player.isBrowserSupported()) {
+        const video = document.getElementById('video');
+        const player = new shaka.Player(video);
 
-<!-- Video player -->
-<video id="videoPlayer" controls></video>
+        // ClearKey license info
+        const clearKey = {
+          '31f91da574d667855834640e323f647d': '044dbc740ad84f6069277a6cabd76adf'
+        };
 
-<!-- Button with stream info -->
-<button class="server-btn" 
-  data-url="https://a168aivottlinear-a.akamaihd.net/IAD/lhr-nitro/clients/dash/enc/llriqg36oy/out/v1/d5d0b76a4cab4567888ffea90cc42a2c/cenc.mpd"
-  data-clearkey='{"31f91da574d667855834640e323f647d":"044dbc740ad84f6069277a6cabd76adf"}'
-  data-type="dash">Play Willow AQ</button>
+        player.configure({
+          drm: {
+            clearKeys: clearKey
+          }
+        });
 
-<script>
-  const video = document.getElementById('videoPlayer');
-  const btn = document.querySelector('.server-btn');
-
-  btn.addEventListener('click', () => {
-    const url = btn.dataset.url;
-    const clearkeyObj = JSON.parse(btn.dataset.clearkey);
-
-    // create dash.js player
-    const player = dashjs.MediaPlayer().create();
-    player.initialize(video, url, true);
-
-    // set ClearKey DRM keys
-    const protectionData = {
-      "org.w3.clearkey": {
-        "clearkeys": clearkeyObj
+        try {
+          await player.load('https://a168aivottlinear-a.akamaihd.net/IAD/lhr-nitro/clients/dash/enc/llriqg36oy/out/v1/d5d0b76a4cab4567888ffea90cc42a2c/cenc.mpd');
+          console.log('The video has now been loaded!');
+        } catch (e) {
+          console.error('Error loading video', e);
+        }
+      } else {
+        console.error('Browser not supported!');
       }
-    };
-    player.setProtectionData(protectionData);
-  });
-</script>
-
+    });
+  </script>
 </body>
 </html>
