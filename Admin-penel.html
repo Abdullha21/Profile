@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Admin Panel - Full Control</title>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, doc, updateDoc, setDoc, collection, onSnapshot, query, where, runTransaction, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBdCCgNbbBhdy13VlfBDyLz5mf0Cug0Yhk",
+      authDomain: "wallet-bainace.firebaseapp.com",
+      projectId: "wallet-bainace",
+      storageBucket: "wallet-bainace.firebasestorage.app",
+      messagingSenderId: "296597283630",
+      appId: "1:296597283630:web:7b5ca4f6157947a3e9d0bf",
+      measurementId: "G-2RCL3WE710"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+
+    setDoc(doc(db, 'adminSettings', 'payment'), { bkash: '017xxxxxxxxx', nagad: '018xxxxxxxxx' }, { merge: true });
+
+    window.changeBkash = async () => {
+      const num = prompt('নতুন bKash নম্বর লিখো:');
+      if (num && num.trim()) {
+        await updateDoc(doc(db, 'adminSettings', 'payment'), { bkash: num.trim() });
+        alert('bKash নম্বর চেঞ্জ হয়েছে!');
+      }
+    };
+
+    window.changeNagad = async () => {
+      const num = prompt('নতুন Nagad নম্বর লিখো:');
+      if (num && num.trim()) {
+        await updateDoc(doc(db, 'adminSettings', 'payment'), { nagad: num.trim() });
+        alert('Nagad নম্বর চেঞ্জ হয়েছে!');
+      }
+    };
+
+    function loadAdminPanel() {
+      onSnapshot(doc(db, 'adminSettings', 'payment'), (snap) => {
+        if (snap.exists()) {
+          const data = snap.data();
+          document.getElementById('currentBkash').textContent = data.bkash || 'সেট করা নেই';
+          document.getElementById('currentNagad').textContent = data.nagad || 'সেট করা নেই';
+        }
+      });
+
+      onSnapshot(collection(db, 'users'), (snapshot) => {
+        const list = document.getElementById('userList');
+        list.innerHTML = '<h3>সব ইউজার - ব্যালেন্স কন্ট্রোল</h3>';
+        snapshot.forEach(docSnap => {
+          const data = docSnap.data();
+          const uid = docSnap.id;
+          list.innerHTML += `
+            <div class="item">
+              <strong>${data.name || 'No Name'}</strong> (${data.phone || 'No Phone'})<br>
+              ${data.email} - ব্যালেন্স: ৳ ${data.balance || 0}
+              <div style="margin-top:10px;">
+                <input type="number" id="bal_${uid}" placeholder="নতুন ব্যালেন্স">
+                <button class="btn-small btn-success" onclick="setBalance('${uid}')">সেট করুন</button>
+              </div>
+            </div>`;
+        });
+      });
+
+      onSnapshot(query(collection(db, 'withdrawRequests'), where('status', '==', 'pending')), (snapshot) => {
+        const list = document.getElementById('pendingList');
+        list.innerHTML = '<h3>পেন্ডিং উইথড্র রিকোয়েস্ট</h3>';
+        if (snapshot.empty) list.innerHTML += '<p>কোনো পেন্ডিং রিকোয়েস্ট নেই</p>';
+        snapshot.forEach(docSnap => {
+          const d = docSnap.data();
+          const id = docSnap.id;
+          list.innerHTML += `
+            <div class="item">
+              <strong>${d.name}</strong> (${d.phone})<br>
+              ${d.method.toUpperCase()} - ${d.number} → ৳ ${d.amount}
+              <div style="margin-top:10px;">
+                <button class="btn-small btn-success" onclick="approve('${id}', ${d.amount}, '${d.userId}')">Approve</button>
+                <button class="btn-small btn-danger" onclick="cancel('${id}')">Cancel</button>
+              </div>
+            </div>`;
+        });
+      });
+
+      let totalApproved = 0;
+      onSnapshot(query(collection(db, 'withdrawRequests'), orderBy('createdAt', 'desc')), (snapshot) => {
+        const list = document.getElementById('historyList');
+        list.innerHTML = '<h3>টোটাল উইথড্র হিস্টরি</h3>';
+        totalApproved = 0;
+        snapshot.forEach(docSnap => {
+          const d = docSnap.data();
+          if (d.status === 'approved') totalApproved += d.amount;
+          const date = d.createdAt ? new Date(d.createdAt.toDate()).toLocaleString('bn-BD') : 'Unknown';
+          list.innerHTML += `
+            <div class="item">
+              <strong>${d.name}</strong> (${d.phone})<br>
+              ${d.method.toUpperCase()} - ${d.number} → ৳ ${d.amount}<br>
+              স্ট্যাটাস: <strong>${d.status.toUpperCase()}</strong> | তারিখ: ${date}
+            </div>`;
+        });
+        document.getElementById('totalAmount').textContent = totalApproved.toLocaleString();
+      });
+    }
+
+    window.setBalance = async (uid) => {
+      const input = document.getElementById(`bal_${uid}`);
+      const newBal = parseFloat(input.value);
+      if (isNaN(newBal)) return alert('সঠিক সংখ্যা দাও');
+      await updateDoc(doc(db, 'users', uid), { balance: newBal });
+      alert('ব্যালেন্স সেট হয়েছে!');
+      input.value = '';
+    };
+
+    window.approve = async (reqId, amount, userId) => {
+      await runTransaction(db, async (t) => {
+        const snap = await t.get(doc(db, 'users', userId));
+        const current = snap.data().balance || 0;
+        t.update(doc(db, 'users', userId), { balance: current - amount });
+        t.update(doc(db, 'withdrawRequests', reqId), { status: 'approved' });
+      });
+      alert('অ্যাপ্রুভ হয়েছে!');
+    };
+
+    window.cancel = async (reqId) => {
+      await updateDoc(doc(db, 'withdrawRequests', reqId), { status: 'cancelled' });
+      alert('ক্যান্সেল হয়েছে');
+    };
+
+    loadAdminPanel();
+  </script>
+
+  <style>
+    body { background: #000; color: #0f0; font-family: 'Courier New', monospace; padding: 20px 20px 80px; text-shadow: 0 0 5px #0f0; }
+    h1, h3 { text-align: center; color: #0f0; text-shadow: 0 0 10px #0f0; margin: 20px 0; }
+    .container { max-width: 800px; margin: 0 auto; }
+    .item { background: #111; border: 1px solid #0f0; padding: 15px; margin: 10px 0; border-radius: 8px; }
+    button { background: #0f0; color: #000; padding: 10px 20px; margin: 5px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+    button:hover { background: #0c0; }
+    .btn-small { padding: 8px 16px; font-size: 14px; }
+    .btn-success { background: #080; }
+    .btn-danger { background: #500; color: white; }
+    input { background: #222; color: #0f0; border: 1px solid #0f0; padding: 8px; border-radius: 4px; }
+    .payment-box { text-align: center; margin: 30px 0; font-size: 18px; }
+    .total { text-align: center; font-size: 24px; margin: 30px 0; color: #ff0; text-shadow: 0 0 10px #ff0; }
+
+    /* স্পষ্ট ক্রেডিট ফুটার */
+    .developer-credit {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(10, 10, 10, 0.95);
+        color: #ccc;
+        text-align: center;
+        padding: 16px;
+        font-size: 16px;
+        border-top: 2px solid #00ff88;
+        z-index: 999;
+        backdrop-filter: blur(6px);
+    }
+    .developer-credit strong {
+        color: #00ff88;
+    }
+    .developer-credit a {
+        color: #00ff88;
+        text-decoration: none;
+        font-weight: bold;
+        margin: 0 6px;
+        transition: 0.3s;
+    }
+    .developer-credit a:hover {
+        color: #fff;
+        text-shadow: 0 0 12px #00ff88;
+    }
+    .developer-credit .version {
+        font-size: 14px;
+        color: #00ff88;
+        margin-left: 15px;
+    }
+    .developer-logo {
+        font-size: 26px;
+        margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>অ্যাডমিন প্যানেল - ফুল কন্ট্রোল 🔥</h1>
+
+
+    <div id="userList"></div>
+    <div id="pendingList"></div>
+
+    <div id="historySection">
+      <div id="historyList"></div>
+      <div class="total">
+        টোটাল অ্যাপ্রুভড উইথড্র: ৳ <span id="totalAmount">0</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ক্রেডিট ফুটার -->
+  <div class="developer-credit">
+      <span class="developer-logo">🚀</span>
+      <strong>Developed by</strong> 
+      <a href="https://t.me/abdullha2" target="_blank">Abdullah Khan</a>
+      <span class="version">v1.0.1</span>
+  </div>
+</body>
+</html>

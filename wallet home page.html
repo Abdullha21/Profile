@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Wallet App</title>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+    import { getFirestore, doc, setDoc, getDoc, updateDoc, collection, addDoc, query, where, onSnapshot, serverTimestamp, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+    const firebaseConfig = {
+      apiKey: "AIzaSyBdCCgNbbBhdy13VlfBDyLz5mf0Cug0Yhk",
+      authDomain: "wallet-bainace.firebaseapp.com",
+      projectId: "wallet-bainace",
+      storageBucket: "wallet-bainace.firebasestorage.app",
+      messagingSenderId: "296597283630",
+      appId: "1:296597283630:web:7b5ca4f6157947a3e9d0bf",
+      measurementId: "G-2RCL3WE710"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+
+    window.register = async function() {
+      const name = document.getElementById('regName').value.trim();
+      const email = document.getElementById('regEmail').value.trim();
+      const phone = document.getElementById('regPhone').value.trim();
+      const password = document.getElementById('regPass').value;
+
+      if (!name || !email || !phone || !password) return alert('সব ফিল্ড পূরণ করুন');
+
+      try {
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        await setDoc(doc(db, 'users', userCredential.user.uid), {
+          name, email, phone, balance: 0, createdAt: serverTimestamp()
+        });
+        alert('রেজিস্ট্রেশন সফল! 😎');
+        showLoginPage();
+      } catch (error) {
+        alert('Error: ' + (error.code === 'auth/email-already-in-use' ? 'ইমেইল আগে ব্যবহৃত' : error.message));
+      }
+    };
+
+    window.login = async function() {
+      const email = document.getElementById('loginEmail').value.trim();
+      const password = document.getElementById('loginPass').value;
+      if (!email || !password) return alert('ফিল্ড পূরণ করুন');
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+      } catch (error) {
+        alert('লগইন ফেইল: ' + error.message);
+      }
+    };
+
+    window.showRegisterPage = () => {
+      document.getElementById('loginPage').classList.add('hidden');
+      document.getElementById('registerPage').classList.remove('hidden');
+    };
+    window.showLoginPage = () => {
+      document.getElementById('registerPage').classList.add('hidden');
+      document.getElementById('loginPage').classList.remove('hidden');
+    };
+
+    onAuthStateChanged(auth, async (user) => {
+      if (user) {
+        const userDoc = await getDoc(doc(db, 'users', user.uid));
+        if (userDoc.exists()) {
+          const data = userDoc.data();
+          document.getElementById('userName').textContent = data.name || 'User';
+          document.getElementById('userEmail').textContent = data.email;
+          document.getElementById('userPhone').textContent = data.phone;
+        }
+
+        document.getElementById('authPages').classList.add('hidden');
+        document.getElementById('userHome').classList.remove('hidden');
+
+        onSnapshot(doc(db, 'users', user.uid), (snap) => {
+          document.getElementById('userBalance').textContent = '৳ ' + (snap.data()?.balance || 0);
+        });
+      } else {
+        document.getElementById('authPages').classList.remove('hidden');
+        document.getElementById('userHome').classList.add('hidden');
+        document.getElementById('loginPage').classList.remove('hidden');
+      }
+    });
+
+    window.openWithdrawModal = () => document.getElementById('withdrawModal').classList.remove('hidden');
+    window.closeWithdrawModal = () => document.getElementById('withdrawModal').classList.add('hidden');
+
+    window.submitWithdraw = async function() {
+      const method = document.getElementById('paymentMethod').value;
+      const number = document.getElementById('withdrawNumber').value;
+      const amount = parseFloat(document.getElementById('withdrawAmount').value);
+      const user = auth.currentUser;
+
+      if (!number || !amount || amount <= 0) return alert('সঠিক তথ্য দিন');
+
+      const userDoc = await getDoc(doc(db, 'users', user.uid));
+      if ((userDoc.data()?.balance || 0) < amount) return alert('ব্যালেন্স যথেষ্ট নেই');
+
+      await addDoc(collection(db, 'withdrawRequests'), {
+        userId: user.uid,
+        name: userDoc.data().name,
+        email: userDoc.data().email,
+        phone: userDoc.data().phone,
+        method, number, amount, status: 'pending', createdAt: serverTimestamp()
+      });
+
+      alert('উইথড্র রিকোয়েস্ট সাবমিট হয়েছে! 💰');
+      closeWithdrawModal();
+    };
+
+    window.showHistory = function() {
+      const list = document.getElementById('historyList');
+      list.classList.toggle('hidden');
+      if (!list.classList.contains('hidden')) {
+        list.innerHTML = '<h3 style="color:#0f0;">উইথড্র হিস্টরি</h3>';
+        onSnapshot(query(collection(db, 'withdrawRequests'), where('userId', '==', auth.currentUser.uid), orderBy('createdAt', 'desc')), (snapshot) => {
+          list.innerHTML = '<h3 style="color:#0f0;">উইথড্র হিস্টরি</h3>';
+          snapshot.forEach(docSnap => {
+            const d = docSnap.data();
+            const date = d.createdAt ? new Date(d.createdAt.toDate()).toLocaleString('bn-BD') : 'Unknown';
+            list.innerHTML += `
+              <div class="item">
+                ${d.method.toUpperCase()} - ${d.number}<br>
+                ৳ ${d.amount} - <strong style="color:${d.status === 'approved' ? '#0f0' : d.status === 'cancelled' ? '#f00' : '#ff0'};">${d.status.toUpperCase()}</strong><br>
+                তারিখ: ${date}
+              </div>`;
+          });
+        });
+      }
+    };
+
+    window.logout = () => signOut(auth);
+  </script>
+
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Courier New', monospace; }
+    body { background: #000; color: #0f0; min-height: 100vh; padding: 20px 20px 80px; text-shadow: 0 0 5px #0f0; }
+    .container { max-width: 500px; margin: 0 auto; }
+    .card { background: #111; border: 1px solid #0f0; border-radius: 12px; padding: 30px; margin: 20px 0; box-shadow: 0 0 20px rgba(0, 255, 0, 0.3); animation: glow 2s infinite alternate; }
+    @keyframes glow { from { box-shadow: 0 0 10px rgba(0, 255, 0, 0.3); } to { box-shadow: 0 0 30px rgba(0, 255, 0, 0.6); } }
+    h1, h2, h3 { text-align: center; color: #0f0; text-shadow: 0 0 10px #0f0; margin-bottom: 20px; }
+    input, select { width: 100%; padding: 14px; margin: 10px 0; background: #222; color: #0f0; border: 1px solid #0f0; border-radius: 8px; }
+    input:focus, select:focus { outline: none; box-shadow: 0 0 10px #0f0; }
+    button { width: 100%; padding: 16px; background: #0f0; color: #000; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin: 10px 0; transition: 0.3s; }
+    button:hover { background: #0c0; transform: scale(1.05); box-shadow: 0 0 20px #0f0; }
+    .balance { font-size: 48px; text-align: center; margin: 30px 0; color: #0f0; text-shadow: 0 0 20px #0f0; font-weight: bold; }
+    .item { background: #222; border: 1px solid #0f0; padding: 15px; margin: 10px 0; border-radius: 8px; }
+    .hidden { display: none !important; }
+    .link { text-align: center; margin: 20px 0; color: #0f0; cursor: pointer; text-decoration: underline; }
+    .link:hover { color: #0c0; }
+
+    /* স্পষ্ট ক্রেডিট ফুটার */
+    .developer-credit {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: rgba(10, 10, 10, 0.95);
+        color: #ccc;
+        text-align: center;
+        padding: 16px;
+        font-size: 16px;
+        border-top: 2px solid #00ff88;
+        z-index: 999;
+        backdrop-filter: blur(6px);
+    }
+    .developer-credit strong {
+        color: #00ff88;
+    }
+    .developer-credit a {
+        color: #00ff88;
+        text-decoration: none;
+        font-weight: bold;
+        margin: 0 6px;
+        transition: 0.3s;
+    }
+    .developer-credit a:hover {
+        color: #fff;
+        text-shadow: 0 0 12px #00ff88;
+    }
+    .developer-credit .version {
+        font-size: 14px;
+        color: #00ff88;
+        margin-left: 15px;
+    }
+    .developer-logo {
+        font-size: 26px;
+        margin-right: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <div id="authPages">
+      <div id="loginPage" class="card">
+        <h1>লগইন</h1>
+        <input type="email" id="loginEmail" placeholder="ইমেইল" />
+        <input type="password" id="loginPass" placeholder="পাসওয়ার্ড" />
+        <button onclick="login()">লগইন করুন</button>
+        <div class="link" onclick="showRegisterPage()">নতুন? রেজিস্টার করুন</div>
+      </div>
+
+      <div id="registerPage" class="card hidden">
+        <h1>রেজিস্টার</h1>
+        <input type="text" id="regName" placeholder="নাম" />
+        <input type="email" id="regEmail" placeholder="ইমেইল" />
+        <input type="tel" id="regPhone" placeholder="ফোন নম্বর" />
+        <input type="password" id="regPass" placeholder="পাসওয়ার্ড" />
+        <button onclick="register()">রেজিস্টার করুন</button>
+        <div class="link" onclick="showLoginPage()">ইতিমধ্যে আছে? লগইন করুন</div>
+      </div>
+    </div>
+
+    <div id="userHome" class="card hidden">
+      <h2>স্বাগতম, <span id="userName">User</span>! 🔥</h2>
+      <p>ইমেইল: <span id="userEmail"></span></p>
+      <p>ফোন: <span id="userPhone"></span></p>
+      <div class="balance" id="userBalance">৳ 0</div>
+
+      <button onclick="openWithdrawModal()">উইথড্র করুন 💸</button>
+      <button onclick="showHistory()">হিস্টরি দেখুন 📜</button>
+      <button onclick="logout()">লগআউট 🔴</button>
+
+      <div id="historyList" class="hidden"></div>
+    </div>
+
+    <div id="withdrawModal" class="card hidden">
+      <h2>উইথড্র রিকোয়েস্ট</h2>
+      <select id="paymentMethod">
+        <option value="bkash">bKash</option>
+        <option value="nagad">Nagad</option>
+      </select>
+      <input type="tel" id="withdrawNumber" placeholder="তোমার নম্বর" />
+      <input type="number" id="withdrawAmount" placeholder="কত টাকা?" />
+      <button onclick="submitWithdraw()">কনফার্ম করুন ✅</button>
+      <button onclick="closeWithdrawModal()">বাতিল ❌</button>
+    </div>
+
+  </div>
+
+  <!-- ক্রেডিট ফুটার -->
+  <div class="developer-credit">
+      <span class="developer-logo">🚀</span>
+      <strong>Developed by</strong> 
+      <a href="https://t.me/abdullha2" target="_blank">Abdullah Khan</a>
+      <span class="version">v1.0.1</span>
+  </div>
+</body>
+</html>
