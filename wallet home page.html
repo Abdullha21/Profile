@@ -165,8 +165,8 @@
       
       getDoc(doc(db, 'users', user.uid)).then(snap => {
         const balance = snap.data()?.balance || 0;
-        if (balance < 100) {
-          showToast('❌ ন্যূনতম ১০০ টাকা প্রয়োজন!', 'error');
+        if (balance < 20) {
+          showToast('❌ ন্যূনতম 20 টাকা প্রয়োজন!', 'error');
           return;
         }
         document.getElementById('withdrawModal').classList.remove('hidden');
@@ -192,8 +192,8 @@
         return;
       }
       
-      if (amount < 100) {
-        showToast('ন্যূনতম ১০০ টাকা উইথড্র করতে হবে', 'error');
+      if (amount < 20) {
+        showToast('ন্যূনতম 20 টাকা উইথড্র করতে হবে', 'error');
         return;
       }
 
@@ -349,7 +349,7 @@
     };
 
     window.openSupport = function() {
-      window.open('https://t.me/honestysupport', '_blank');
+      window.open('https://wa.me/8801624651631', '_blank');
     };
 
     window.logout = () => {
@@ -402,7 +402,7 @@
           const amount = parseFloat(this.value) || 0;
           const balance = parseFloat(document.getElementById('currentBalance')?.textContent) || 0;
           
-          if (amount < 100) {
+          if (amount < 20) {
             this.style.borderColor = '#ff3860';
           } else if (amount > balance) {
             this.style.borderColor = '#ffdd57';
@@ -1345,7 +1345,7 @@
     </div>
     <div id="headerUser" class="header-user hidden">
       <div class="user-avatar" id="userNameSmall">U</div>
-      <span id="userGreeting">হ্যালো!</span>
+      <span id="userGreeting">HI</span>
     </div>
   </div>
 
@@ -1523,7 +1523,7 @@
   <div class="footer">
     <div class="developer-credit">
       <strong>Developed by</strong> 
-      <a href="https://t.me/abdullha2" target="_blank">Abdullah Khan</a>
+      <a href="#" target="_blank">Abdullah Khan</a>
       <span class="version">v2.5.0</span>
     </div>
   </div>
