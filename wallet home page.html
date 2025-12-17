@@ -339,8 +339,7 @@
         }
       }
     };
-
-    // ভিডিও গ্যালারি iframe ফাংশন
+        // ভিডিও গ্যালারি iframe ফাংশন
     window.openVideoGallery = function() {
       document.getElementById('videoGalleryModal').classList.remove('hidden');
       loadVideos();
@@ -385,7 +384,42 @@
           videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
           category: "tutorial"
         },
-        
+        {
+          id: 2,
+          title: "আয়ের উপায়",
+          thumbnail: "https://img.youtube.com/vi/9bZkp7q19f0/mqdefault.jpg",
+          videoUrl: "https://www.youtube.com/embed/9bZkp7q19f0",
+          category: "earning"
+        },
+        {
+          id: 3,
+          title: "সাকসেস স্টোরি",
+          thumbnail: "https://img.youtube.com/vi/J---aiyznGQ/mqdefault.jpg",
+          videoUrl: "https://www.youtube.com/embed/J---aiyznGQ",
+          category: "success"
+        },
+        {
+          id: 4,
+          title: "টিউটোরিয়াল ভিডিও ২",
+          thumbnail: "https://img.youtube.com/vi/LDU_Txk06tM/mqdefault.jpg",
+          videoUrl: "https://www.youtube.com/embed/LDU_Txk06tM",
+          category: "tutorial"
+        },
+        {
+          id: 5,
+          title: "টিপস এন্ড ট্রিকস",
+          thumbnail: "https://img.youtube.com/vi/ZXsQAXx_ao0/mqdefault.jpg",
+          videoUrl: "https://www.youtube.com/embed/ZXsQAXx_ao0",
+          category: "earning"
+        },
+        {
+          id: 6,
+          title: "মোটিভেশন",
+          thumbnail: "https://img.youtube.com/vi/7wtfhZwyrcc/mqdefault.jpg",
+          videoUrl: "https://www.youtube.com/embed/7wtfhZwyrcc",
+          category: "success"
+        }
+      ];
       
       let html = '';
       videos.forEach(video => {
@@ -416,7 +450,7 @@
     };
 
     window.openSupport = function() {
-      window.open('https://wa.me/8801624651631', '_blank');
+      window.open('https://t.me/abdullha2', '_blank');
     };
 
     window.logout = () => {
@@ -811,8 +845,8 @@
       transform: rotate(30deg);
       animation: shine 3s infinite;
     }
-    
-    @keyframes shine {
+
+        @keyframes shine {
       0% { transform: rotate(30deg) translateX(-100%); }
       100% { transform: rotate(30deg) translateX(100%); }
     }
@@ -1140,7 +1174,8 @@
       color: #ffaa00;
       font-weight: 600;
     }
-        /* লোডার */
+    
+    /* লোডার */
     .loader {
       position: fixed;
       top: 0;
@@ -1341,8 +1376,7 @@
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
     }
-    
-    .video-category {
+        .video-category {
       display: inline-block;
       padding: 4px 12px;
       background: rgba(0, 255, 136, 0.1);
@@ -1575,7 +1609,7 @@
   <div class="header">
     <div class="logo">
       <!-- এখানে আপনার লোগো লিংক দিন -->
-      <img src="https://uploads.onecompiler.io/42weeh2u8/447u2x33g/1000028376.jpg" alt="Honesty Earning Logo" class="logo-img" id="logoImg" onerror="this.style.display='none'; document.getElementById('logoIcon').style.display='block';">
+      <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Honesty Earning Logo" class="logo-img" id="logoImg" onerror="this.style.display='none'; document.getElementById('logoIcon').style.display='block';">
       <div class="logo-icon" id="logoIcon">💎</div>
       <div class="logo-text">
         <div class="logo-title">Honesty Earning</div>
@@ -1731,6 +1765,9 @@
         <!-- ভিডিও ক্যাটাগরি -->
         <div class="video-categories">
           <button class="category-btn active" onclick="filterVideos('all')">সব ভিডিও</button>
+          <button class="category-btn" onclick="filterVideos('tutorial')">টিউটোরিয়াল</button>
+          <button class="category-btn" onclick="filterVideos('earning')">আয়ের উপায়</button>
+          <button class="category-btn" onclick="filterVideos('success')">সাকসেস স্টোরি</button>
         </div>
         
         <!-- ভিডিও গ্রিড -->
