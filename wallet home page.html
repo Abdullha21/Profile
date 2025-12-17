@@ -3,7 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Honesty Earning Support</title>
+  <title>Honesty Earning</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
@@ -24,232 +25,1508 @@
     const auth = getAuth(app);
     const db = getFirestore(app);
 
+    let historyListener = null;
+    let balanceListener = null;
+
     window.register = async function() {
       const name = document.getElementById('regName').value.trim();
       const email = document.getElementById('regEmail').value.trim();
       const phone = document.getElementById('regPhone').value.trim();
       const password = document.getElementById('regPass').value;
 
-      if (!name || !email || !phone || !password) return alert('সব ফিল্ড পূরণ করুন');
+      if (!name || !email || !phone || !password) {
+        showToast('সব তথ্য পূরণ করুন', 'error');
+        return;
+      }
+
+      if (password.length < 6) {
+        showToast('পাসওয়ার্ড কমপক্ষে ৬ অক্ষরের হতে হবে', 'error');
+        return;
+      }
 
       try {
+        showLoading(true);
         const userCredential = await createUserWithEmailAndPassword(auth, email, password);
         await setDoc(doc(db, 'users', userCredential.user.uid), {
-          name, email, phone, balance: 0, createdAt: serverTimestamp()
+          name, 
+          email, 
+          phone, 
+          balance: 200,
+          totalEarned: 0,
+          totalWithdrawn: 0,
+          createdAt: serverTimestamp(),
+          lastLogin: serverTimestamp()
         });
-        alert('রেজিস্ট্রেশন সফল! 😎');
+        showToast('🎉 রেজিস্ট্রেশন সফল! স্বাগতম', 'success');
         showLoginPage();
       } catch (error) {
-        alert('Error: ' + (error.code === 'auth/email-already-in-use' ? 'ইমেইল আগে ব্যবহৃত' : error.message));
+        const message = error.code === 'auth/email-already-in-use' ? 'এই ইমেইল আগে ব্যবহৃত হয়েছে' : 
+                       error.code === 'auth/weak-password' ? 'পাসওয়ার্ড শক্তিশালী করুন' :
+                       error.message;
+        showToast('❌ ' + message, 'error');
+      } finally {
+        showLoading(false);
       }
     };
 
     window.login = async function() {
       const email = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPass').value;
-      if (!email || !password) return alert('ফিল্ড পূরণ করুন');
+      
+      if (!email || !password) {
+        showToast('ইমেইল ও পাসওয়ার্ড দিন', 'error');
+        return;
+      }
+      
       try {
+        showLoading(true);
         await signInWithEmailAndPassword(auth, email, password);
+        showToast('✅ লগইন সফল!', 'success');
       } catch (error) {
-        alert('লগইন ফেইল: ' + error.message);
+        const message = error.code === 'auth/invalid-credential' ? 'ভুল ইমেইল বা পাসওয়ার্ড' :
+                       error.code === 'auth/user-not-found' ? 'ইউজার খুঁজে পাওয়া যায়নি' :
+                       'লগইনে সমস্যা: ' + error.message;
+        showToast('❌ ' + message, 'error');
+      } finally {
+        showLoading(false);
       }
     };
 
     window.showRegisterPage = () => {
       document.getElementById('loginPage').classList.add('hidden');
       document.getElementById('registerPage').classList.remove('hidden');
+      document.getElementById('pageTitle').innerHTML = '<i class="fas fa-user-plus"></i> রেজিস্টার';
     };
+    
     window.showLoginPage = () => {
       document.getElementById('registerPage').classList.add('hidden');
       document.getElementById('loginPage').classList.remove('hidden');
+      document.getElementById('pageTitle').innerHTML = '<i class="fas fa-sign-in-alt"></i> লগইন';
     };
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
+        // পূর্ববর্তী লিসেনার বন্ধ করুন
+        if (balanceListener) balanceListener();
+        
         const userDoc = await getDoc(doc(db, 'users', user.uid));
         if (userDoc.exists()) {
           const data = userDoc.data();
           document.getElementById('userName').textContent = data.name || 'User';
           document.getElementById('userEmail').textContent = data.email;
           document.getElementById('userPhone').textContent = data.phone;
+          document.getElementById('userNameSmall').textContent = data.name?.split(' ')[0] || 'User';
+          
+          // শেষ লগইন আপডেট
+          await updateDoc(doc(db, 'users', user.uid), {
+            lastLogin: serverTimestamp()
+          });
         }
 
         document.getElementById('authPages').classList.add('hidden');
         document.getElementById('userHome').classList.remove('hidden');
+        document.getElementById('headerUser').classList.remove('hidden');
 
-        onSnapshot(doc(db, 'users', user.uid), (snap) => {
-          document.getElementById('userBalance').textContent = '৳ ' + (snap.data()?.balance || 0);
+        // রিয়েল-টাইম ব্যালেন্স আপডেট
+        balanceListener = onSnapshot(doc(db, 'users', user.uid), (snap) => {
+          const balance = snap.data()?.balance || 0;
+          document.getElementById('userBalance').innerHTML = '৳ <span class="balance-amount">' + balance.toLocaleString('bn-BD') + '</span>';
+          document.getElementById('withdrawBtn').disabled = balance < 100;
+          
+          if (balance < 100) {
+            document.getElementById('withdrawBtn').classList.add('disabled');
+            document.getElementById('withdrawBtn').setAttribute('title', 'ন্যূনতম ১০০ টাকা প্রয়োজন');
+          } else {
+            document.getElementById('withdrawBtn').classList.remove('disabled');
+          }
         });
       } else {
         document.getElementById('authPages').classList.remove('hidden');
         document.getElementById('userHome').classList.add('hidden');
         document.getElementById('loginPage').classList.remove('hidden');
+        document.getElementById('headerUser').classList.add('hidden');
+        document.getElementById('pageTitle').innerHTML = '<i class="fas fa-sign-in-alt"></i> লগইন';
+        
+        // লিসেনার বন্ধ করুন
+        if (balanceListener) {
+          balanceListener();
+          balanceListener = null;
+        }
+        if (historyListener) {
+          historyListener();
+          historyListener = null;
+        }
       }
     });
 
-    window.openWithdrawModal = () => document.getElementById('withdrawModal').classList.remove('hidden');
-    window.closeWithdrawModal = () => document.getElementById('withdrawModal').classList.add('hidden');
+    window.openWithdrawModal = () => {
+      const user = auth.currentUser;
+      if (!user) return;
+      
+      getDoc(doc(db, 'users', user.uid)).then(snap => {
+        const balance = snap.data()?.balance || 0;
+        if (balance < 100) {
+          showToast('❌ ন্যূনতম ১০০ টাকা প্রয়োজন!', 'error');
+          return;
+        }
+        document.getElementById('withdrawModal').classList.remove('hidden');
+        document.getElementById('currentBalance').textContent = balance;
+        document.getElementById('maxAmount').value = balance;
+      });
+    };
+    
+    window.closeWithdrawModal = () => {
+      document.getElementById('withdrawModal').classList.add('hidden');
+      document.getElementById('withdrawNumber').value = '';
+      document.getElementById('withdrawAmount').value = '';
+    };
 
     window.submitWithdraw = async function() {
       const method = document.getElementById('paymentMethod').value;
-      const number = document.getElementById('withdrawNumber').value;
+      const number = document.getElementById('withdrawNumber').value.trim();
       const amount = parseFloat(document.getElementById('withdrawAmount').value);
       const user = auth.currentUser;
 
-      if (!number || !amount || amount <= 0) return alert('সঠিক তথ্য দিন');
+      if (!number || !amount || amount <= 0) {
+        showToast('সঠিক তথ্য দিন', 'error');
+        return;
+      }
+      
+      if (amount < 100) {
+        showToast('ন্যূনতম ১০০ টাকা উইথড্র করতে হবে', 'error');
+        return;
+      }
 
       const userDoc = await getDoc(doc(db, 'users', user.uid));
-      if ((userDoc.data()?.balance || 0) < amount) return alert('ব্যালেন্স যথেষ্ট নেই');
+      const userData = userDoc.data();
+      const currentBalance = userData?.balance || 0;
+      
+      if (currentBalance < amount) {
+        showToast('পর্যাপ্ত ব্যালেন্স নেই!', 'error');
+        return;
+      }
 
-      await addDoc(collection(db, 'withdrawRequests'), {
-        userId: user.uid,
-        name: userDoc.data().name,
-        email: userDoc.data().email,
-        phone: userDoc.data().phone,
-        method, number, amount, status: 'pending', createdAt: serverTimestamp()
-      });
+      if (number.length !== 11 || !number.startsWith('01')) {
+        showToast('সঠিক মোবাইল নম্বর দিন', 'error');
+        return;
+      }
 
-      alert('উইথড্র রিকোয়েস্ট সাবমিট হয়েছে! 💰');
-      closeWithdrawModal();
-    };
-
-    window.showHistory = function() {
-      const list = document.getElementById('historyList');
-      list.classList.toggle('hidden');
-      if (!list.classList.contains('hidden')) {
-        list.innerHTML = '<h3 style="color:#0f0;">উইথড্র হিস্টরি</h3>';
-        onSnapshot(query(collection(db, 'withdrawRequests'), where('userId', '==', auth.currentUser.uid), orderBy('createdAt', 'desc')), (snapshot) => {
-          list.innerHTML = '<h3 style="color:#0f0;">উইথড্র হিস্টরি</h3>';
-          snapshot.forEach(docSnap => {
-            const d = docSnap.data();
-            const date = d.createdAt ? new Date(d.createdAt.toDate()).toLocaleString('bn-BD') : 'Unknown';
-            list.innerHTML += `
-              <div class="item">
-                ${d.method.toUpperCase()} - ${d.number}<br>
-                ৳ ${d.amount} - <strong style="color:${d.status === 'approved' ? '#0f0' : d.status === 'cancelled' ? '#f00' : '#ff0'};">${d.status.toUpperCase()}</strong><br>
-                তারিখ: ${date}
-              </div>`;
-          });
+      try {
+        showLoading(true);
+        
+        // ব্যালেন্স আপডেট করুন
+        await updateDoc(doc(db, 'users', user.uid), {
+          balance: currentBalance - amount,
+          totalWithdrawn: (userData.totalWithdrawn || 0) + amount
         });
+
+        // উইথড্র রিকোয়েস্ট তৈরি করুন
+        await addDoc(collection(db, 'withdrawRequests'), {
+          userId: user.uid,
+          name: userData.name,
+          email: userData.email,
+          phone: userData.phone,
+          method, 
+          number, 
+          amount, 
+          status: 'pending',
+          adminNote: '',
+          processedAt: null,
+          createdAt: serverTimestamp()
+        });
+
+        showToast('✅ উইথড্র রিকোয়েস্ট সফল!', 'success');
+        closeWithdrawModal();
+      } catch (error) {
+        showToast('❌ ত্রুটি: ' + error.message, 'error');
+      } finally {
+        showLoading(false);
       }
     };
 
-    window.logout = () => signOut(auth);
+    window.showHistory = function() {
+      const user = auth.currentUser;
+      if (!user) return;
+      
+      const list = document.getElementById('historyList');
+      const historyBtn = document.getElementById('historyBtn');
+      
+      list.classList.toggle('hidden');
+      historyBtn.classList.toggle('active');
+      
+      if (!list.classList.contains('hidden')) {
+        // পূর্ববর্তী লিসেনার বন্ধ করুন
+        if (historyListener) {
+          historyListener();
+        }
+        
+        list.innerHTML = '<div class="history-loading"><i class="fas fa-spinner fa-spin"></i> লোড হচ্ছে...</div>';
+        
+        // নতুন লিসেনার তৈরি করুন
+        historyListener = onSnapshot(
+          query(
+            collection(db, 'withdrawRequests'), 
+            where('userId', '==', user.uid), 
+            orderBy('createdAt', 'desc')
+          ), 
+          (snapshot) => {
+            if (snapshot.empty) {
+              list.innerHTML = '<div class="no-history"><i class="fas fa-history"></i> কোনো উইথড্র রিকোয়েস্ট নেই</div>';
+              return;
+            }
+            
+            let html = '<div class="history-header">';
+            html += '<h4><i class="fas fa-history"></i> উইথড্র হিস্টরি <span class="history-count">' + snapshot.size + ' টি</span></h4>';
+            html += '</div>';
+            
+            html += '<div class="history-items">';
+            
+            snapshot.forEach(docSnap => {
+              const d = docSnap.data();
+              const date = d.createdAt && d.createdAt.toDate 
+                ? d.createdAt.toDate().toLocaleDateString('bn-BD', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                  }) + ' • ' + d.createdAt.toDate().toLocaleTimeString('bn-BD', {
+                    hour: '2-digit',
+                    minute: '2-digit'
+                  })
+                : 'তারিখ অজানা';
+              
+              const statusIcon = d.status === 'approved' ? '<i class="fas fa-check-circle"></i>' : 
+                                d.status === 'cancelled' ? '<i class="fas fa-times-circle"></i>' : 
+                                '<i class="fas fa-clock"></i>';
+              const statusClass = d.status === 'approved' ? 'status-success' : 
+                                 d.status === 'cancelled' ? 'status-cancelled' : 
+                                 'status-pending';
+              
+              const methodIcons = {
+                'bkash': '<i class="fas fa-money-bill-wave"></i>',
+                'nagad': '<i class="fas fa-mobile-alt"></i>',
+                'rocket': '<i class="fas fa-rocket"></i>',
+                'upay': '<i class="fas fa-credit-card"></i>'
+              };
+              
+              html += `
+                <div class="history-item ${statusClass}">
+                  <div class="history-item-top">
+                    <div class="method-icon">${methodIcons[d.method] || '<i class="fas fa-wallet"></i>'}</div>
+                    <div class="history-amount">৳ ${d.amount.toLocaleString('bn-BD')}</div>
+                    <div class="status-badge">${statusIcon}</div>
+                  </div>
+                  <div class="history-item-bottom">
+                    <div><i class="fas fa-phone"></i> ${d.number}</div>
+                    <div><i class="far fa-clock"></i> ${date}</div>
+                    ${d.adminNote ? `<div class="admin-note"><i class="fas fa-sticky-note"></i> ${d.adminNote}</div>` : ''}
+                  </div>
+                </div>`;
+            });
+            
+            html += '</div>';
+            list.innerHTML = html;
+          }, 
+          (error) => {
+            console.error('হিস্টরি লোডে ত্রুটি:', error);
+            list.innerHTML = '<div class="error-msg"><i class="fas fa-exclamation-triangle"></i> হিস্টরি লোড করতে সমস্যা হয়েছে</div>';
+          }
+        );
+      } else {
+        // লিসেনার বন্ধ করুন
+        if (historyListener) {
+          historyListener();
+          historyListener = null;
+        }
+      }
+    };
+
+    window.openVideoGallery = function() {
+      document.getElementById('videoGalleryModal').classList.remove('hidden');
+    };
+
+    window.closeVideoGallery = function() {
+      document.getElementById('videoGalleryModal').classList.add('hidden');
+    };
+
+    window.openSupport = function() {
+      window.open('https://t.me/abdullha2', '_blank');
+    };
+
+    window.logout = () => {
+      if (historyListener) {
+        historyListener();
+        historyListener = null;
+      }
+      if (balanceListener) {
+        balanceListener();
+        balanceListener = null;
+      }
+      signOut(auth);
+      showToast('👋 লগআউট সফল!', 'success');
+    };
+
+    // ইউটিলিটি ফাংশন
+    function showToast(message, type = 'info') {
+      const toast = document.getElementById('toast');
+      toast.innerHTML = message;
+      toast.className = 'toast toast-' + type;
+      toast.classList.remove('hidden');
+      
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 4000);
+    }
+
+    function showLoading(show) {
+      const loader = document.getElementById('loader');
+      if (show) {
+        loader.classList.remove('hidden');
+      } else {
+        loader.classList.add('hidden');
+      }
+    }
+
+            // ডোম লোড হলে
+    document.addEventListener('DOMContentLoaded', function() {
+      // লোগো ছবি লোড করুন (এখানে আপনার লোগো লিংক দিন)
+      const logoImg = document.getElementById('logoImg');
+      logoImg.onerror = function() {
+        this.style.display = 'none';
+        document.getElementById('logoIcon').style.display = 'block';
+      };
+      
+      // উইথড্র amount change হলে
+      const amountInput = document.getElementById('withdrawAmount');
+      if (amountInput) {
+        amountInput.addEventListener('input', function() {
+          const amount = parseFloat(this.value) || 0;
+          const balance = parseFloat(document.getElementById('currentBalance')?.textContent) || 0;
+          
+          if (amount < 100) {
+            this.style.borderColor = '#ff3860';
+          } else if (amount > balance) {
+            this.style.borderColor = '#ffdd57';
+          } else {
+            this.style.borderColor = '#23d160';
+          }
+        });
+      }
+    });
   </script>
 
   <style>
-    * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Courier New', monospace; }
-    body { background: #000; color: #0f0; min-height: 100vh; padding: 20px 20px 80px; text-shadow: 0 0 5px #0f0; }
-    .container { max-width: 500px; margin: 0 auto; }
-    .card { background: #111; border: 1px solid #0f0; border-radius: 12px; padding: 30px; margin: 20px 0; box-shadow: 0 0 20px rgba(0, 255, 0, 0.3); animation: glow 2s infinite alternate; }
-    @keyframes glow { from { box-shadow: 0 0 10px rgba(0, 255, 0, 0.3); } to { box-shadow: 0 0 30px rgba(0, 255, 0, 0.6); } }
-    h1, h2, h3 { text-align: center; color: #0f0; text-shadow: 0 0 10px #0f0; margin-bottom: 20px; }
-    input, select { width: 100%; padding: 14px; margin: 10px 0; background: #222; color: #0f0; border: 1px solid #0f0; border-radius: 8px; }
-    input:focus, select:focus { outline: none; box-shadow: 0 0 10px #0f0; }
-    button { width: 100%; padding: 16px; background: #0f0; color: #000; border: none; border-radius: 8px; font-size: 18px; font-weight: bold; cursor: pointer; margin: 10px 0; transition: 0.3s; }
-    button:hover { background: #0c0; transform: scale(1.05); box-shadow: 0 0 20px #0f0; }
-    .balance { font-size: 48px; text-align: center; margin: 30px 0; color: #0f0; text-shadow: 0 0 20px #0f0; font-weight: bold; }
-    .item { background: #222; border: 1px solid #0f0; padding: 15px; margin: 10px 0; border-radius: 8px; }
-    .hidden { display: none !important; }
-    .link { text-align: center; margin: 20px 0; color: #0f0; cursor: pointer; text-decoration: underline; }
-    .link:hover { color: #0c0; }
+    * { 
+      margin: 0; 
+      padding: 0; 
+      box-sizing: border-box; 
+      font-family: 'Segoe UI', 'Roboto', sans-serif; 
+    }
+    
+    body { 
+      background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0a0a0a 100%);
+      color: #fff; 
+      min-height: 100vh;
+      padding: 0;
+      position: relative;
+      overflow-x: hidden;
+    }
+    
+    body::before {
+      content: '';
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: 
+        radial-gradient(circle at 10% 20%, rgba(0, 255, 136, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 90% 80%, rgba(0, 200, 255, 0.1) 0%, transparent 40%),
+        radial-gradient(circle at 50% 50%, rgba(255, 0, 255, 0.05) 0%, transparent 60%);
+      z-index: -2;
+      pointer-events: none;
+    }
+    
+    /* হেডার */
+    .header {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10, 10, 10, 0.95);
+      backdrop-filter: blur(10px);
+      z-index: 1000;
+      padding: 15px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 2px solid #00ff88;
+      box-shadow: 0 5px 30px rgba(0, 255, 136, 0.2);
+    }
+    
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+    
+    .logo-img {
+      width: 45px;
+      height: 45px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px solid #00ff88;
+      box-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+    }
+    
+    .logo-icon {
+      display: none;
+      font-size: 32px;
+      color: #00ff88;
+    }
+    
+    .logo-text {
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .logo-title {
+      font-size: 22px;
+      font-weight: 800;
+      background: linear-gradient(90deg, #00ff88, #00ccff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: 0.5px;
+      text-shadow: 0 2px 10px rgba(0, 255, 136, 0.3);
+    }
+    
+    .logo-subtitle {
+      font-size: 12px;
+      color: #aaa;
+      font-weight: 500;
+      margin-top: 2px;
+    }
+    
+    .header-user {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #fff;
+      font-weight: 600;
+      background: rgba(0, 255, 136, 0.1);
+      padding: 8px 15px;
+      border-radius: 50px;
+      border: 1px solid rgba(0, 255, 136, 0.3);
+    }
+    
+    .user-avatar {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, #00ff88, #00ccff);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #000;
+      font-weight: bold;
+      font-size: 16px;
+    }
+    
+    .container { 
+      max-width: 500px; 
+      margin: 0 auto; 
+      padding: 80px 20px 120px;
+    }
+    
+    /* কার্ড স্টাইল - আগের থিম */
+    .card { 
+      background: rgba(20, 20, 30, 0.85);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      border-radius: 20px;
+      padding: 30px;
+      margin: 20px 0;
+      box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.5),
+        0 0 30px rgba(0, 255, 136, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+      transition: all 0.3s;
+      animation: float 6s ease-in-out infinite;
+    }
+    
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 
+        0 15px 40px rgba(0, 0, 0, 0.6),
+        0 0 40px rgba(0, 255, 136, 0.2),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    }
+    
+    @keyframes float {
+      0%, 100% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+    }
+    
+    h1, h2, h3 { 
+      text-align: center; 
+      margin-bottom: 25px; 
+      font-weight: 700;
+    }
+    
+    .page-title {
+      text-align: center;
+      font-size: 26px;
+      background: linear-gradient(90deg, #00ff88, #00ccff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      margin-bottom: 30px;
+      font-weight: 800;
+      text-shadow: 0 2px 10px rgba(0, 255, 136, 0.3);
+    }
+    
+    input, select { 
+      width: 100%; 
+      padding: 16px 20px; 
+      margin: 15px 0; 
+      background: rgba(40, 40, 50, 0.8);
+      color: #fff; 
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      border-radius: 12px; 
+      font-size: 16px;
+      transition: all 0.3s;
+    }
+    
+    input:focus, select:focus { 
+      outline: none; 
+      border-color: #00ff88;
+      box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.2);
+      background: rgba(50, 50, 60, 0.9);
+    }
+    
+    input::placeholder {
+      color: rgba(255, 255, 255, 0.5);
+    }
+    
+    /* অ্যাপ স্টাইল বাটন - ছোট এবং এক লাইনে ২টা */
+    .button-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin: 25px 0;
+    }
+    
+    .app-button {
+      background: rgba(30, 30, 40, 0.9);
+      border: 1px solid rgba(0, 255, 136, 0.2);
+      border-radius: 16px;
+      padding: 20px 15px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.3s;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      min-height: 110px;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .app-button::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 3px;
+      background: linear-gradient(90deg, #00ff88, #00ccff);
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    
+    .app-button:hover {
+      transform: translateY(-5px);
+      border-color: #00ff88;
+      box-shadow: 0 10px 25px rgba(0, 255, 136, 0.3);
+      background: rgba(40, 40, 50, 0.95);
+    }
+    
+    .app-button:hover::before {
+      opacity: 1;
+    }
+    
+    .app-button:disabled,
+    .app-button.disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      transform: none !important;
+      box-shadow: none !important;
+      border-color: rgba(255, 255, 255, 0.1) !important;
+    }
+    
+    .app-button i {
+      font-size: 28px;
+      margin-bottom: 12px;
+      color: #00ff88;
+      transition: transform 0.3s;
+    }
+    
+    .app-button:hover i {
+      transform: scale(1.2);
+    }
+    
+    .app-button .button-text {
+      font-size: 14px;
+      line-height: 1.3;
+    }
+    
+    /* বিশেষ বাটন */
+    .button-primary {
+      background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 200, 255, 0.1));
+      border-color: rgba(0, 255, 136, 0.4);
+    }
+    
+    .button-secondary {
+      background: linear-gradient(135deg, rgba(155, 89, 182, 0.2), rgba(142, 68, 173, 0.1));
+      border-color: rgba(155, 89, 182, 0.4);
+    }
+    
+    .button-warning {
+      background: linear-gradient(135deg, rgba(241, 196, 15, 0.2), rgba(243, 156, 18, 0.1));
+      border-color: rgba(241, 196, 15, 0.4);
+    }
+    
+    .button-danger {
+      background: linear-gradient(135deg, rgba(231, 76, 60, 0.2), rgba(192, 57, 43, 0.1));
+      border-color: rgba(231, 76, 60, 0.4);
+    }
+    
+    /* বড় বাটন */
+    .btn {
+      width: 100%;
+      padding: 18px;
+      background: linear-gradient(135deg, #00ff88 0%, #00cc66 100%);
+      color: #000;
+      border: none;
+      border-radius: 12px;
+      font-size: 18px;
+      font-weight: 700;
+      cursor: pointer;
+      margin: 15px 0;
+      transition: all 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      letter-spacing: 0.5px;
+    }
+    
+    .btn:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 25px rgba(0, 255, 136, 0.4);
+    }
+    
+    .btn-danger {
+      background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
+    }
+    
+    .btn-danger:hover {
+      box-shadow: 0 10px 25px rgba(255, 68, 68, 0.4);
+    }
+    
+    /* ব্যালেন্স */
+    .balance-container {
+      background: rgba(0, 0, 0, 0.5);
+      border: 2px solid rgba(0, 255, 136, 0.4);
+      border-radius: 20px;
+      padding: 25px;
+      text-align: center;
+      margin: 25px 0;
+      position: relative;
+      overflow: hidden;
+    }
+    
+    .balance-container::before {
+      content: '';
+      position: absolute;
+      top: -50%;
+      right: -50%;
+      width: 100%;
+      height: 200%;
+      background: linear-gradient(45deg, transparent, rgba(0, 255, 136, 0.1), transparent);
+      transform: rotate(30deg);
+      animation: shine 3s infinite;
+    }
+    
+    @keyframes shine {
+      0% { transform: rotate(30deg) translateX(-100%); }
+      100% { transform: rotate(30deg) translateX(100%); }
+    }
+    
+    .balance-label {
+      font-size: 16px;
+      color: #aaa;
+      margin-bottom: 10px;
+    }
+    
+    .balance-amount {
+      font-size: 48px;
+      font-weight: 800;
+      color: #00ff88;
+      text-shadow: 0 0 20px rgba(0, 255, 136, 0.7);
+      letter-spacing: 1px;
+    }
+    
+    .balance-note {
+      font-size: 14px;
+      color: #ffaa00;
+      margin-top: 10px;
+    }
+    
+    /* ইউজার ইনফো */
+    .user-info {
+      background: rgba(40, 40, 50, 0.6);
+      border-radius: 15px;
+      padding: 20px;
+      margin-bottom: 25px;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .info-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    }
+    
+    .info-item:last-child {
+      border-bottom: none;
+    }
+    
+    .info-label {
+      color: #aaa;
+      font-weight: 500;
+    }
+    
+    .info-value {
+      color: #fff;
+      font-weight: 600;
+    }
+    
+    /* হিস্টরি */
+    .history-container {
+      margin-top: 25px;
+      animation: slideDown 0.3s ease;
+    }
+    
+    @keyframes slideDown {
+      from {
+        opacity: 0;
+        transform: translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    .history-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid rgba(0, 255, 136, 0.3);
+    }
+    
+    .history-header h4 {
+      margin: 0;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 18px;
+      color: #00ff88;
+    }
+    
+    .history-count {
+      background: rgba(0, 255, 136, 0.2);
+      color: #00ff88;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 14px;
+      font-weight: 700;
+    }
+    
+    .history-items {
+      max-height: 400px;
+      overflow-y: auto;
+      padding-right: 10px;
+    }
+    
+    .history-items::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    .history-items::-webkit-scrollbar-track {
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 3px;
+    }
+    
+    .history-items::-webkit-scrollbar-thumb {
+      background: #00ff88;
+      border-radius: 3px;
+    }
+    
+    .history-item {
+      background: rgba(30, 30, 40, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 18px;
+      margin-bottom: 15px;
+      transition: all 0.3s;
+    }
+    
+    .history-item:hover {
+      background: rgba(40, 40, 50, 0.9);
+      border-color: rgba(0, 255, 136, 0.3);
+      transform: translateX(5px);
+    }
+    
+    .history-item.status-success {
+      border-left: 4px solid #00ff88;
+    }
+    
+    .history-item.status-pending {
+      border-left: 4px solid #ffaa00;
+    }
+    
+    .history-item.status-cancelled {
+      border-left: 4px solid #ff4444;
+    }
+    
+    .history-item-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 15px;
+    }
+    
+    .method-icon {
+      font-size: 24px;
+      color: #00ccff;
+    }
+    
+    .history-amount {
+      font-size: 24px;
+      font-weight: 800;
+      color: #00ff88;
+    }
+    
+    .status-badge {
+      font-size: 20px;
+    }
+    
+    .status-success .status-badge {
+      color: #00ff88;
+    }
+    
+    .status-pending .status-badge {
+      color: #ffaa00;
+    }
+    
+    .status-cancelled .status-badge {
+      color: #ff4444;
+    }
+    
+    .history-item-bottom {
+      border-top: 1px solid rgba(255, 255, 255, 0.1);
+      padding-top: 15px;
+      font-size: 14px;
+      color: #aaa;
+    }
+    
+    .history-item-bottom div {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    
+    .history-item-bottom i {
+      width: 16px;
+      color: #00ff88;
+    }
+    
+    .admin-note {
+      color: #ffaa00 !important;
+      font-style: italic;
+      padding: 8px;
+      background: rgba(255, 170, 0, 0.1);
+      border-radius: 8px;
+      margin-top: 10px !important;
+    }
+    
+    .no-history, .history-loading, .error-msg {
+      text-align: center;
+      padding: 40px;
+      color: #aaa;
+      font-size: 16px;
+    }
+    
+    .history-loading i {
+      margin-right: 10px;
+      animation: spin 1s linear infinite;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    /* মোডাল */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(5px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+      padding: 20px;
+    }
+    
+    .modal-content {
+      background: rgba(20, 20, 30, 0.95);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      border-radius: 20px;
+      padding: 25px;
+      width: 100%;
+      max-width: 400px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.7);
+      animation: modalAppear 0.3s ease;
+    }
+    
+    @keyframes modalAppear {
+      from {
+        opacity: 0;
+        transform: scale(0.9) translateY(-20px);
+      }
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
+    }
+    
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 25px;
+      padding-bottom: 15px;
+      border-bottom: 2px solid rgba(0, 255, 136, 0.3);
+    }
+    
+    .modal-title {
+      font-size: 22px;
+      font-weight: 700;
+      color: #00ff88;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .close-btn {
+      background: rgba(255, 255, 255, 0.1);
+      border: none;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      color: #fff;
+      font-size: 20px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s;
+    }
+    
+    .close-btn:hover {
+      background: rgba(255, 68, 68, 0.3);
+      color: #ff4444;
+      transform: rotate(90deg);
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 10px;
+      font-weight: 600;
+      color: #fff;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .form-note {
+      font-size: 14px;
+      color: #aaa;
+      margin-top: 8px;
+    }
+    
+    .min-amount {
+      color: #ffaa00;
+      font-weight: 600;
+    }
 
-    /* স্পষ্ট ক্রেডিট ফুটার */
+        /* লোডার */
+    .loader {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.9);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 3000;
+      gap: 20px;
+    }
+    
+    .loader-spinner {
+      width: 60px;
+      height: 60px;
+      border: 4px solid rgba(255, 255, 255, 0.1);
+      border-top-color: #00ff88;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+    
+    .loader-text {
+      color: #00ff88;
+      font-size: 18px;
+      font-weight: 600;
+    }
+    
+    /* টোস্ট */
+    .toast {
+      position: fixed;
+      bottom: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(20, 20, 30, 0.95);
+      color: white;
+      padding: 18px 25px;
+      border-radius: 15px;
+      font-weight: 600;
+      z-index: 4000;
+      max-width: 90%;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(0, 255, 136, 0.3);
+      backdrop-filter: blur(10px);
+      animation: toastSlide 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+    
+    @keyframes toastSlide {
+      from {
+        opacity: 0;
+        transform: translate(-50%, 20px);
+      }
+      to {
+        opacity: 1;
+        transform: translate(-50%, 0);
+      }
+    }
+    
+    .toast-success {
+      border-color: #00ff88;
+      background: rgba(0, 255, 136, 0.15);
+    }
+    
+    .toast-error {
+      border-color: #ff4444;
+      background: rgba(255, 68, 68, 0.15);
+    }
+    
+    .toast-info {
+      border-color: #00ccff;
+      background: rgba(0, 204, 255, 0.15);
+    }
+    
+    .hidden { 
+      display: none !important; 
+    }
+    
+    .link { 
+      text-align: center; 
+      margin: 20px 0; 
+      color: #00ff88; 
+      cursor: pointer; 
+      font-weight: 600;
+      transition: color 0.3s;
+    }
+    
+    .link:hover { 
+      color: #00ccff; 
+      text-decoration: underline;
+    }
+    
+    /* ভিডিও গ্যালারি */
+    .video-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+      margin-top: 20px;
+    }
+    
+    .video-placeholder {
+      background: rgba(40, 40, 50, 0.7);
+      border-radius: 12px;
+      padding: 20px;
+      text-align: center;
+      border: 2px dashed rgba(0, 255, 136, 0.3);
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #aaa;
+    }
+    
+    .video-placeholder i {
+      font-size: 32px;
+      margin-bottom: 10px;
+      color: #00ff88;
+    }
+    
+    /* ফুটার */
+    .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10, 10, 15, 0.95);
+      border-top: 2px solid #00ff88;
+      padding: 18px 20px;
+      text-align: center;
+      z-index: 999;
+      backdrop-filter: blur(10px);
+    }
+    
     .developer-credit {
-        position: fixed;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        background: rgba(10, 10, 10, 0.95);
-        color: #ccc;
-        text-align: center;
-        padding: 16px;
-        font-size: 16px;
-        border-top: 2px solid #00ff88;
-        z-index: 999;
-        backdrop-filter: blur(6px);
+      color: #aaa;
+      font-size: 15px;
     }
+    
     .developer-credit strong {
-        color: #00ff88;
+      color: #00ff88;
+      font-weight: 700;
     }
+    
     .developer-credit a {
-        color: #00ff88;
-        text-decoration: none;
-        font-weight: bold;
-        margin: 0 6px;
-        transition: 0.3s;
+      color: #00ccff;
+      text-decoration: none;
+      font-weight: 700;
+      margin: 0 8px;
+      transition: all 0.3s;
     }
+    
     .developer-credit a:hover {
-        color: #fff;
-        text-shadow: 0 0 12px #00ff88;
+      color: #00ff88;
+      text-shadow: 0 0 15px rgba(0, 255, 136, 0.7);
     }
-    .developer-credit .version {
+    
+    .version {
+      color: #00ff88;
+      margin-left: 15px;
+      font-weight: 600;
+      background: rgba(0, 255, 136, 0.1);
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 14px;
+    }
+    
+    /* রেস্পন্সিভ */
+    @media (max-width: 600px) {
+      .container {
+        padding: 80px 15px 120px;
+      }
+      
+      .card {
+        padding: 25px 20px;
+        margin: 15px 0;
+      }
+      
+      .button-grid {
+        gap: 12px;
+      }
+      
+      .app-button {
+        min-height: 100px;
+        padding: 15px 10px;
+      }
+      
+      .app-button i {
+        font-size: 24px;
+        margin-bottom: 10px;
+      }
+      
+      .balance-amount {
+        font-size: 42px;
+      }
+      
+      .header {
+        padding: 12px 15px;
+      }
+      
+      .logo-title {
+        font-size: 20px;
+      }
+      
+      .logo-img {
+        width: 40px;
+        height: 40px;
+      }
+      
+      .header-user {
         font-size: 14px;
-        color: #00ff88;
-        margin-left: 15px;
+        padding: 6px 12px;
+      }
     }
-    .developer-logo {
-        font-size: 26px;
-        margin-right: 10px;
+    
+    @media (max-width: 400px) {
+      .button-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .balance-amount {
+        font-size: 36px;
+      }
+      
+      .app-button {
+        min-height: 90px;
+      }
+      
+      .header-user span {
+        display: none;
+      }
     }
   </style>
 </head>
 <body>
-  <div class="container">
+  <!-- হেডার -->
+  <div class="header">
+    <div class="logo">
+      <!-- এখানে আপনার লোগো লিংক দিন -->
+      <img src="https://uploads.onecompiler.io/42weeh2u8/447u2x33g/1000028376.jpg" alt="Honesty Earning Logo" class="logo-img" id="logoImg" onerror="this.style.display='none'; document.getElementById('logoIcon').style.display='block';">
+      <div class="logo-icon" id="logoIcon">💎</div>
+      <div class="logo-text">
+        <div class="logo-title">Honesty Earning</div>
+        <div class="logo-subtitle">Earn With Honesty</div>
+      </div>
+    </div>
+    <div id="headerUser" class="header-user hidden">
+      <div class="user-avatar" id="userNameSmall">U</div>
+      <span id="userGreeting">হ্যালো!</span>
+    </div>
+  </div>
 
+  <!-- লোডার -->
+  <div id="loader" class="loader hidden">
+    <div class="loader-spinner"></div>
+    <div class="loader-text">লোড হচ্ছে...</div>
+  </div>
+
+  <!-- টোস্ট -->
+  <div id="toast" class="toast hidden"></div>
+
+  <div class="container">
+    <!-- অথেন্টিকেশন -->
     <div id="authPages">
       <div id="loginPage" class="card">
-        <h1>লগইন</h1>
-        <input type="email" id="loginEmail" placeholder="ইমেইল" />
+        <div class="page-title" id="pageTitle"><i class="fas fa-sign-in-alt"></i> লগইন</div>
+        <input type="email" id="loginEmail" placeholder="ইমেইল এড্রেস" />
         <input type="password" id="loginPass" placeholder="পাসওয়ার্ড" />
-        <button onclick="login()">লগইন করুন</button>
-        <div class="link" onclick="showRegisterPage()">নতুন? রেজিস্টার করুন</div>
+        <button class="btn" onclick="login()">
+          <i class="fas fa-sign-in-alt"></i>
+          লগইন করুন
+        </button>
+        <div class="link" onclick="showRegisterPage()">নতুন একাউন্ট? রেজিস্টার করুন</div>
       </div>
 
       <div id="registerPage" class="card hidden">
-        <h1>রেজিস্টার</h1>
-        <input type="text" id="regName" placeholder="নাম" />
-        <input type="email" id="regEmail" placeholder="ইমেইল" />
-        <input type="tel" id="regPhone" placeholder="ফোন নম্বর" />
-        <input type="password" id="regPass" placeholder="পাসওয়ার্ড" />
-        <button onclick="register()">রেজিস্টার করুন</button>
-        <div class="link" onclick="showLoginPage()">ইতিমধ্যে আছে? লগইন করুন</div>
+        <div class="page-title" id="pageTitle"><i class="fas fa-user-plus"></i> রেজিস্টার</div>
+        <input type="text" id="regName" placeholder="পূর্ণ নাম" />
+        <input type="email" id="regEmail" placeholder="ইমেইল এড্রেস" />
+        <input type="tel" id="regPhone" placeholder="ফোন নম্বর (01XXXXXXXXX)" />
+        <input type="password" id="regPass" placeholder="পাসওয়ার্ড (৬ অক্ষরের বেশি)" />
+        <button class="btn" onclick="register()">
+          <i class="fas fa-user-plus"></i>
+          একাউন্ট তৈরি করুন
+        </button>
+        <div class="link" onclick="showLoginPage()">ইতিমধ্যে একাউন্ট আছে? লগইন করুন</div>
       </div>
     </div>
 
+    <!-- ইউজার ড্যাশবোর্ড -->
     <div id="userHome" class="card hidden">
-      <h2>স্বাগতম, <span id="userName">User</span>! 🔥</h2>
-      <p>ইমেইল: <span id="userEmail"></span></p>
-      <p>ফোন: <span id="userPhone"></span></p>
-      <div class="balance" id="userBalance">৳ 0</div>
+      <div class="user-info">
+        <div class="info-item">
+          <span class="info-label">নাম:</span>
+          <span class="info-value" id="userName"></span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">ইমেইল:</span>
+          <span class="info-value" id="userEmail"></span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">ফোন:</span>
+          <span class="info-value" id="userPhone"></span>
+        </div>
+      </div>
+      
+      <div class="balance-container">
+        <div class="balance-label">আপনার ব্যালেন্স</div>
+        <div class="balance-amount" id="userBalance">৳ <span class="balance-amount">0</span></div>
+        <div class="balance-note">ন্যূনতম উইথড্র: ৳১০০</div>
+      </div>
+      
+      <!-- অ্যাপ স্টাইল বাটন গ্রিড -->
+      <div class="button-grid">
+        <button class="app-button button-primary" onclick="openWithdrawModal()" id="withdrawBtn">
+          <i class="fas fa-money-bill-wave"></i>
+          <span class="button-text">উইথড্র করুন</span>
+        </button>
+        
+        <button class="app-button button-secondary" onclick="showHistory()" id="historyBtn">
+          <i class="fas fa-history"></i>
+          <span class="button-text">হিস্টরি</span>
+        </button>
+        
+        <button class="app-button button-warning" onclick="openVideoGallery()">
+          <i class="fas fa-video"></i>
+          <span class="button-text">ভিডিও গ্যালারি</span>
+        </button>
+        
+        <button class="app-button" onclick="openSupport()">
+          <i class="fas fa-headset"></i>
+          <span class="button-text">সাপোর্ট</span>
+        </button>
+      </div>
+      
+      <button class="btn btn-danger" onclick="logout()">
+        <i class="fas fa-sign-out-alt"></i>
+        লগআউট
+      </button>
 
-      <button onclick="openWithdrawModal()">উইথড্র করুন 💸</button>
-      <button onclick="showHistory()">হিস্টরি দেখুন 📜</button>
-      <button onclick="logout()">লগআউট 🔴</button>
-
-      <div id="historyList" class="hidden"></div>
+      <!-- হিস্টরি -->
+      <div id="historyList" class="history-container hidden"></div>
     </div>
 
-    <div id="withdrawModal" class="card hidden">
-      <h2>উইথড্র রিকোয়েস্ট</h2>
-      <select id="paymentMethod">
-        <option value="bkash">bKash</option>
-        <option value="nagad">Nagad</option>
-      </select>
-      <input type="tel" id="withdrawNumber" placeholder="তোমার নম্বর" />
-      <input type="number" id="withdrawAmount" placeholder="কত টাকা?" />
-      <button onclick="submitWithdraw()">কনফার্ম করুন ✅</button>
-      <button onclick="closeWithdrawModal()">বাতিল ❌</button>
+    <!-- উইথড্র মোডাল -->
+    <div id="withdrawModal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title"><i class="fas fa-money-bill-wave"></i> উইথড্র রিকোয়েস্ট</h3>
+          <button class="close-btn" onclick="closeWithdrawModal()">×</button>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-wallet"></i> পেমেন্ট পদ্ধতি</label>
+          <select id="paymentMethod">
+            <option value="bkash">bKash</option>
+            <option value="nagad">Nagad</option>
+            <option value="rocket">Rocket</option>
+            <option value="upay">Upay</option>
+          </select>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-mobile-alt"></i> মোবাইল নম্বর</label>
+          <input type="tel" id="withdrawNumber" placeholder="01XXXXXXXXX" maxlength="11" />
+          <div class="form-note">পেমেন্ট পদ্ধতির সাথে মিল থাকতে হবে</div>
+        </div>
+        
+        <div class="form-group">
+          <label class="form-label"><i class="fas fa-coins"></i> টাকার পরিমাণ</label>
+          <input type="number" id="withdrawAmount" placeholder="৳ 100" min="100" />
+          <div class="form-note">
+            <i class="fas fa-wallet"></i> বর্তমান: <span id="currentBalance">0</span> টাকা<br>
+            <span class="min-amount"><i class="fas fa-exclamation-circle"></i> ন্যূনতম: ৳১০০</span>
+          </div>
+        </div>
+        
+        <button class="btn" onclick="submitWithdraw()">
+          <i class="fas fa-paper-plane"></i>
+          সাবমিট করুন
+        </button>
+      </div>
     </div>
 
+    <!-- ভিডিও গ্যালারি মোডাল -->
+    <div id="videoGalleryModal" class="modal-overlay hidden">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h3 class="modal-title"><i class="fas fa-video"></i> ভিডিও গ্যালারি</h3>
+          <button class="close-btn" onclick="closeVideoGallery()">×</button>
+        </div>
+        
+        <p style="text-align: center; color: #aaa; margin-bottom: 20px;">
+          ভিডিও গ্যালারি শীঘ্রই আপডেট করা হবে
+        </p>
+        
+        <div class="video-grid">
+          <div class="video-placeholder">
+            <i class="fas fa-film"></i>
+            <div>ভিডিও ১</div>
+          </div>
+          <div class="video-placeholder">
+            <i class="fas fa-film"></i>
+            <div>ভিডিও ২</div>
+          </div>
+          <div class="video-placeholder">
+            <i class="fas fa-film"></i>
+            <div>ভিডিও ৩</div>
+          </div>
+          <div class="video-placeholder">
+            <i class="fas fa-film"></i>
+            <div>ভিডিও ৪</div>
+          </div>
+        </div>
+        
+        <div style="text-align: center; margin-top: 25px; color: #00ff88; font-size: 14px;">
+          <i class="fas fa-info-circle"></i> নতুন ভিডিও যোগ করতে টেলিগ্রামে যোগাযোগ করুন
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- ক্রেডিট ফুটার -->
-  <div class="developer-credit">
-      <span class="developer-logo">🚀</span>
+  <!-- ফুটার -->
+  <div class="footer">
+    <div class="developer-credit">
       <strong>Developed by</strong> 
-      <a href="https://t.me/abdullha2" target="_blank">Abdullah Khan</a>
-      <span class="version">v1.0.1</span>
+      <a href="https://t.me/honestysupport" target="_blank">Abdullah Khan</a>
+      <span class="version">v2.5.0</span>
+    </div>
   </div>
 </body>
 </html>
+
