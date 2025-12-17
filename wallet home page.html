@@ -131,11 +131,11 @@
         balanceListener = onSnapshot(doc(db, 'users', user.uid), (snap) => {
           const balance = snap.data()?.balance || 0;
           document.getElementById('userBalance').innerHTML = '৳ <span class="balance-amount">' + balance.toLocaleString('bn-BD') + '</span>';
-          document.getElementById('withdrawBtn').disabled = balance < 100;
+          document.getElementById('withdrawBtn').disabled = balance < 20;
           
-          if (balance < 100) {
+          if (balance < 20) {
             document.getElementById('withdrawBtn').classList.add('disabled');
-            document.getElementById('withdrawBtn').setAttribute('title', 'ন্যূনতম ১০০ টাকা প্রয়োজন');
+            document.getElementById('withdrawBtn').setAttribute('title', 'ন্যূনতম 20 টাকা প্রয়োজন');
           } else {
             document.getElementById('withdrawBtn').classList.remove('disabled');
           }
@@ -165,8 +165,8 @@
       
       getDoc(doc(db, 'users', user.uid)).then(snap => {
         const balance = snap.data()?.balance || 0;
-        if (balance < 100) {
-          showToast('❌ ন্যূনতম ১০০ টাকা প্রয়োজন!', 'error');
+        if (balance < 20) {
+          showToast('❌ ন্যূনতম 20 টাকা প্রয়োজন!', 'error');
           return;
         }
         document.getElementById('withdrawModal').classList.remove('hidden');
@@ -192,8 +192,8 @@
         return;
       }
       
-      if (amount < 100) {
-        showToast('ন্যূনতম ১০০ টাকা উইথড্র করতে হবে', 'error');
+      if (amount < 20) {
+        showToast('ন্যূনতম 20 টাকা উইথড্র করতে হবে', 'error');
         return;
       }
 
@@ -383,41 +383,6 @@
           thumbnail: "https://img.youtube.com/vi/dQw4w9WgXcQ/mqdefault.jpg",
           videoUrl: "https://www.youtube.com/embed/dQw4w9WgXcQ",
           category: "tutorial"
-        },
-        {
-          id: 2,
-          title: "আয়ের উপায়",
-          thumbnail: "https://img.youtube.com/vi/9bZkp7q19f0/mqdefault.jpg",
-          videoUrl: "https://www.youtube.com/embed/9bZkp7q19f0",
-          category: "earning"
-        },
-        {
-          id: 3,
-          title: "সাকসেস স্টোরি",
-          thumbnail: "https://img.youtube.com/vi/J---aiyznGQ/mqdefault.jpg",
-          videoUrl: "https://www.youtube.com/embed/J---aiyznGQ",
-          category: "success"
-        },
-        {
-          id: 4,
-          title: "টিউটোরিয়াল ভিডিও ২",
-          thumbnail: "https://img.youtube.com/vi/LDU_Txk06tM/mqdefault.jpg",
-          videoUrl: "https://www.youtube.com/embed/LDU_Txk06tM",
-          category: "tutorial"
-        },
-        {
-          id: 5,
-          title: "টিপস এন্ড ট্রিকস",
-          thumbnail: "https://img.youtube.com/vi/ZXsQAXx_ao0/mqdefault.jpg",
-          videoUrl: "https://www.youtube.com/embed/ZXsQAXx_ao0",
-          category: "earning"
-        },
-        {
-          id: 6,
-          title: "মোটিভেশন",
-          thumbnail: "https://img.youtube.com/vi/7wtfhZwyrcc/mqdefault.jpg",
-          videoUrl: "https://www.youtube.com/embed/7wtfhZwyrcc",
-          category: "success"
         }
       ];
       
@@ -450,7 +415,7 @@
     };
 
     window.openSupport = function() {
-      window.open('https://t.me/abdullha2', '_blank');
+      window.open('https://wa.me/8801624651631', '_blank');
     };
 
     window.logout = () => {
@@ -1609,7 +1574,7 @@
   <div class="header">
     <div class="logo">
       <!-- এখানে আপনার লোগো লিংক দিন -->
-      <img src="https://cdn-icons-png.flaticon.com/512/3135/3135715.png" alt="Honesty Earning Logo" class="logo-img" id="logoImg" onerror="this.style.display='none'; document.getElementById('logoIcon').style.display='block';">
+      <img src="https://uploads.onecompiler.io/42weeh2u8/447u2x33g/1000028376.jpg" alt="Honesty Earning Logo" class="logo-img" id="logoImg" onerror="this.style.display='none'; document.getElementById('logoIcon').style.display='block';">
       <div class="logo-icon" id="logoIcon">💎</div>
       <div class="logo-text">
         <div class="logo-title">Honesty Earning</div>
