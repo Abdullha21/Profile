@@ -106,7 +106,6 @@
 
     onAuthStateChanged(auth, async (user) => {
       if (user) {
-        // পূর্ববর্তী লিসেনার বন্ধ করুন
         if (balanceListener) balanceListener();
         
         const userDoc = await getDoc(doc(db, 'users', user.uid));
@@ -117,7 +116,6 @@
           document.getElementById('userPhone').textContent = data.phone;
           document.getElementById('userNameSmall').textContent = data.name?.split(' ')[0] || 'User';
           
-          // শেষ লগইন আপডেট
           await updateDoc(doc(db, 'users', user.uid), {
             lastLogin: serverTimestamp()
           });
@@ -127,7 +125,6 @@
         document.getElementById('userHome').classList.remove('hidden');
         document.getElementById('headerUser').classList.remove('hidden');
 
-        // রিয়েল-টাইম ব্যালেন্স আপডেট
         balanceListener = onSnapshot(doc(db, 'users', user.uid), (snap) => {
           const balance = snap.data()?.balance || 0;
           document.getElementById('userBalance').innerHTML = '৳ <span class="balance-amount">' + balance.toLocaleString('bn-BD') + '</span>';
@@ -147,7 +144,6 @@
         document.getElementById('headerUser').classList.add('hidden');
         document.getElementById('pageTitle').innerHTML = '<i class="fas fa-sign-in-alt"></i> লগইন';
         
-        // লিসেনার বন্ধ করুন
         if (balanceListener) {
           balanceListener();
           balanceListener = null;
@@ -171,7 +167,6 @@
         }
         document.getElementById('withdrawModal').classList.remove('hidden');
         document.getElementById('currentBalance').textContent = balance;
-        document.getElementById('maxAmount').value = balance;
       });
     };
     
@@ -214,13 +209,11 @@
       try {
         showLoading(true);
         
-        // ব্যালেন্স আপডেট করুন
         await updateDoc(doc(db, 'users', user.uid), {
           balance: currentBalance - amount,
           totalWithdrawn: (userData.totalWithdrawn || 0) + amount
         });
 
-        // উইথড্র রিকোয়েস্ট তৈরি করুন
         await addDoc(collection(db, 'withdrawRequests'), {
           userId: user.uid,
           name: userData.name,
@@ -255,14 +248,12 @@
       historyBtn.classList.toggle('active');
       
       if (!list.classList.contains('hidden')) {
-        // পূর্ববর্তী লিসেনার বন্ধ করুন
         if (historyListener) {
           historyListener();
         }
         
         list.innerHTML = '<div class="history-loading"><i class="fas fa-spinner fa-spin"></i> লোড হচ্ছে...</div>';
         
-        // নতুন লিসেনার তৈরি করুন
         historyListener = onSnapshot(
           query(
             collection(db, 'withdrawRequests'), 
@@ -332,14 +323,13 @@
           }
         );
       } else {
-        // লিসেনার বন্ধ করুন
         if (historyListener) {
           historyListener();
           historyListener = null;
         }
       }
     };
-        // ভিডিও গ্যালারি iframe ফাংশন
+
     window.openVideoGallery = function() {
       document.getElementById('videoGalleryModal').classList.remove('hidden');
       loadVideos();
@@ -353,10 +343,8 @@
       const videoPlayer = document.getElementById('videoPlayer');
       const videoFrame = document.getElementById('videoFrame');
       
-      // ভিডিও URL সেট করুন
       videoFrame.src = videoUrl;
       
-      // ভিডিও প্লেয়ার দেখান
       videoPlayer.classList.remove('hidden');
     };
 
@@ -364,18 +352,14 @@
       const videoPlayer = document.getElementById('videoPlayer');
       const videoFrame = document.getElementById('videoFrame');
       
-      // ভিডিও স্টপ করুন
       videoFrame.src = '';
       
-      // ভিডিও প্লেয়ার লুকান
       videoPlayer.classList.add('hidden');
     };
 
-    // ভিডিও লোড করার ফাংশন
     function loadVideos() {
       const videoGrid = document.getElementById('videoGrid');
       
-      // আপনার ভিডিও লিংক এখানে যোগ করুন
       const videos = [
         {
           id: 1,
@@ -404,14 +388,11 @@
       
       videoGrid.innerHTML = html;
     }
-        // ভিডিও ফিল্টার ফাংশন
+
     window.filterVideos = function(category) {
       const buttons = document.querySelectorAll('.category-btn');
       buttons.forEach(btn => btn.classList.remove('active'));
       event.target.classList.add('active');
-      
-      // এখানে ফিল্টার লজিক যোগ করতে পারেন
-      // আপাতত সব ভিডিও দেখাচ্ছে
     };
 
     window.openSupport = function() {
@@ -431,7 +412,6 @@
       showToast('👋 লগআউট সফল!', 'success');
     };
 
-    // ইউটিলিটি ফাংশন
     function showToast(message, type = 'info') {
       const toast = document.getElementById('toast');
       toast.innerHTML = message;
@@ -452,9 +432,7 @@
       }
     }
 
-    // ডোম লোড হলে
     document.addEventListener('DOMContentLoaded', function() {
-      // লোগো ছবি লোড করুন
       const logoImg = document.getElementById('logoImg');
       logoImg.onerror = function() {
         this.style.display = 'none';
@@ -495,7 +473,6 @@
       pointer-events: none;
     }
     
-    /* হেডার */
     .header {
       position: fixed;
       top: 0;
@@ -587,14 +564,11 @@
       padding: 80px 20px 120px;
     }
     
-    /* কার্ড স্টাইল */
     .card { 
       background: rgba(20, 20, 30, 0.85);
       backdrop-filter: blur(10px);
       border: 1px solid rgba(0, 255, 136, 0.3);
       border-radius: 20px;
-      padding: 30px;
-      margin: 20px 0;
       box-shadow: 
         0 10px 30px rgba(0, 0, 0, 0.5),
         0 0 30px rgba(0, 255, 136, 0.1),
@@ -616,12 +590,6 @@
       50% { transform: translateY(-10px); }
     }
     
-    h1, h2, h3 { 
-      text-align: center; 
-      margin-bottom: 25px; 
-      font-weight: 700;
-    }
-    
     .page-title {
       text-align: center;
       font-size: 26px;
@@ -629,7 +597,7 @@
       -webkit-background-clip: text;
       background-clip: text;
       color: transparent;
-      margin-bottom: 30px;
+      margin-bottom: 30;
       font-weight: 800;
       text-shadow: 0 2px 10px rgba(0, 255, 136, 0.3);
     }
@@ -657,7 +625,6 @@
       color: rgba(255, 255, 255, 0.5);
     }
     
-    /* বাটন গ্রিড */
     .button-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -733,28 +700,6 @@
       line-height: 1.3;
     }
     
-    /* বিশেষ বাটন */
-    .button-primary {
-      background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 200, 255, 0.1));
-      border-color: rgba(0, 255, 136, 0.4);
-    }
-    
-    .button-secondary {
-      background: linear-gradient(135deg, rgba(155, 89, 182, 0.2), rgba(142, 68, 173, 0.1));
-      border-color: rgba(155, 89, 182, 0.4);
-    }
-    
-    .button-warning {
-      background: linear-gradient(135deg, rgba(241, 196, 15, 0.2), rgba(243, 156, 18, 0.1));
-      border-color: rgba(241, 196, 15, 0.4);
-    }
-    
-    .button-danger {
-      background: linear-gradient(135deg, rgba(231, 76, 60, 0.2), rgba(192, 57, 43, 0.1));
-      border-color: rgba(231, 76, 60, 0.4);
-    }
-    
-    /* বড় বাটন */
     .btn {
       width: 100%;
       padding: 18px;
@@ -787,7 +732,6 @@
       box-shadow: 0 10px 25px rgba(255, 68, 68, 0.4);
     }
     
-    /* ব্যালেন্স */
     .balance-container {
       background: rgba(0, 0, 0, 0.5);
       border: 2px solid rgba(0, 255, 136, 0.4);
@@ -811,7 +755,7 @@
       animation: shine 3s infinite;
     }
 
-        @keyframes shine {
+    @keyframes shine {
       0% { transform: rotate(30deg) translateX(-100%); }
       100% { transform: rotate(30deg) translateX(100%); }
     }
@@ -836,7 +780,6 @@
       margin-top: 10px;
     }
     
-    /* ইউজার ইনফো */
     .user-info {
       background: rgba(40, 40, 50, 0.6);
       border-radius: 15px;
@@ -866,177 +809,16 @@
       font-weight: 600;
     }
     
-    /* হিস্টরি */
     .history-container {
       margin-top: 25px;
       animation: slideDown 0.3s ease;
     }
     
     @keyframes slideDown {
-      from {
-        opacity: 0;
-        transform: translateY(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
     }
     
-    .history-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-      padding-bottom: 15px;
-      border-bottom: 2px solid rgba(0, 255, 136, 0.3);
-    }
-    
-    .history-header h4 {
-      margin: 0;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 18px;
-      color: #00ff88;
-    }
-    
-    .history-count {
-      background: rgba(0, 255, 136, 0.2);
-      color: #00ff88;
-      padding: 5px 15px;
-      border-radius: 20px;
-      font-size: 14px;
-      font-weight: 700;
-    }
-    
-    .history-items {
-      max-height: 400px;
-      overflow-y: auto;
-      padding-right: 10px;
-    }
-    
-    .history-items::-webkit-scrollbar {
-      width: 6px;
-    }
-    
-    .history-items::-webkit-scrollbar-track {
-      background: rgba(255, 255, 255, 0.05);
-      border-radius: 3px;
-    }
-    
-    .history-items::-webkit-scrollbar-thumb {
-      background: #00ff88;
-      border-radius: 3px;
-    }
-    
-    .history-item {
-      background: rgba(30, 30, 40, 0.7);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 15px;
-      padding: 18px;
-      margin-bottom: 15px;
-      transition: all 0.3s;
-    }
-    
-    .history-item:hover {
-      background: rgba(40, 40, 50, 0.9);
-      border-color: rgba(0, 255, 136, 0.3);
-      transform: translateX(5px);
-    }
-    
-    .history-item.status-success {
-      border-left: 4px solid #00ff88;
-    }
-    
-    .history-item.status-pending {
-      border-left: 4px solid #ffaa00;
-    }
-    
-    .history-item.status-cancelled {
-      border-left: 4px solid #ff4444;
-    }
-    
-    .history-item-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 15px;
-    }
-    
-    .method-icon {
-      font-size: 24px;
-      color: #00ccff;
-    }
-    
-    .history-amount {
-      font-size: 24px;
-      font-weight: 800;
-      color: #00ff88;
-    }
-    
-    .status-badge {
-      font-size: 20px;
-    }
-    
-    .status-success .status-badge {
-      color: #00ff88;
-    }
-    
-    .status-pending .status-badge {
-      color: #ffaa00;
-    }
-    
-    .status-cancelled .status-badge {
-      color: #ff4444;
-    }
-    
-    .history-item-bottom {
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-      padding-top: 15px;
-      font-size: 14px;
-      color: #aaa;
-    }
-    
-    .history-item-bottom div {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 8px;
-    }
-    
-    .history-item-bottom i {
-      width: 16px;
-      color: #00ff88;
-    }
-    
-    .admin-note {
-      color: #ffaa00 !important;
-      font-style: italic;
-      padding: 8px;
-      background: rgba(255, 170, 0, 0.1);
-      border-radius: 8px;
-      margin-top: 10px !important;
-    }
-    
-    .no-history, .history-loading, .error-msg {
-      text-align: center;
-      padding: 40px;
-      color: #aaa;
-      font-size: 16px;
-    }
-    
-    .history-loading i {
-      margin-right: 10px;
-      animation: spin 1s linear infinite;
-    }
-    
-    @keyframes spin {
-      0% { transform: rotate(0deg); }
-      100% { transform: rotate(360deg); }
-    }
-    
-    /* মোডাল */
     .modal-overlay {
       position: fixed;
       top: 0;
@@ -1066,81 +848,10 @@
     }
     
     @keyframes modalAppear {
-      from {
-        opacity: 0;
-        transform: scale(0.9) translateY(-20px);
-      }
-      to {
-        opacity: 1;
-        transform: scale(1) translateY(0);
-      }
+      from { opacity: 0; transform: scale(0.9) translateY(-20px); }
+      to { opacity: 1; transform: scale(1) translateY(0); }
     }
     
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 25px;
-      padding-bottom: 15px;
-      border-bottom: 2px solid rgba(0, 255, 136, 0.3);
-    }
-    
-    .modal-title {
-      font-size: 22px;
-      font-weight: 700;
-      color: #00ff88;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    
-    .close-btn {
-      background: rgba(255, 255, 255, 0.1);
-      border: none;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      color: #fff;
-      font-size: 20px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      transition: all 0.3s;
-    }
-    
-    .close-btn:hover {
-      background: rgba(255, 68, 68, 0.3);
-      color: #ff4444;
-      transform: rotate(90deg);
-    }
-    
-    .form-group {
-      margin-bottom: 20px;
-    }
-    
-    .form-label {
-      display: block;
-      margin-bottom: 10px;
-      font-weight: 600;
-      color: #fff;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-    
-    .form-note {
-      font-size: 14px;
-      color: #aaa;
-      margin-top: 8px;
-    }
-    
-    .min-amount {
-      color: #ffaa00;
-      font-weight: 600;
-    }
-    
-    /* লোডার */
     .loader {
       position: fixed;
       top: 0;
@@ -1165,13 +876,11 @@
       animation: spin 1s linear infinite;
     }
     
-    .loader-text {
-      color: #00ff88;
-      font-size: 18px;
-      font-weight: 600;
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
     }
     
-    /* টোস্ট */
     .toast {
       position: fixed;
       bottom: 100px;
@@ -1195,34 +904,11 @@
     }
     
     @keyframes toastSlide {
-      from {
-        opacity: 0;
-        transform: translate(-50%, 20px);
-      }
-      to {
-        opacity: 1;
-        transform: translate(-50%, 0);
-      }
+      from { opacity: 0; transform: translate(-50%, 20px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
     }
     
-    .toast-success {
-      border-color: #00ff88;
-      background: rgba(0, 255, 136, 0.15);
-    }
-    
-    .toast-error {
-      border-color: #ff4444;
-      background: rgba(255, 68, 68, 0.15);
-    }
-    
-    .toast-info {
-      border-color: #00ccff;
-      background: rgba(0, 204, 255, 0.15);
-    }
-    
-    .hidden { 
-      display: none !important; 
-    }
+    .hidden { display: none !important; }
     
     .link { 
       text-align: center; 
@@ -1237,8 +923,8 @@
       color: #00ccff; 
       text-decoration: underline;
     }
-    
-    /* ভিডিও গ্যালারি স্টাইল */
+
+    /* ভিডিও গ্যালারি স্টাইল - আপডেটেড */
     .video-categories {
       display: flex;
       gap: 10px;
@@ -1266,7 +952,6 @@
       border-color: #00ff88;
     }
     
-    /* ভিডিও গ্রিড */
     .video-grid {
       display: grid;
       grid-template-columns: repeat(2, 1fr);
@@ -1287,15 +972,16 @@
     }
     
     .video-item:hover {
-      transform: translateY(-5px
+      transform: translateY(-5px);
       border-color: #00ff88;
       box-shadow: 0 10px 25px rgba(0, 255, 136, 0.3);
     }
     
     .video-thumbnail {
       position: relative;
-      height: 140px;
+      height: 160px;
       overflow: hidden;
+      border-radius: 12px;
     }
     
     .video-thumbnail img {
@@ -1306,7 +992,7 @@
     }
     
     .video-item:hover .video-thumbnail img {
-      transform: scale(1.1);
+      transform: scale(1.08);
     }
     
     .play-btn {
@@ -1341,7 +1027,8 @@
       -webkit-line-clamp: 2;
       -webkit-box-orient: vertical;
     }
-        .video-category {
+    
+    .video-category {
       display: inline-block;
       padding: 4px 12px;
       background: rgba(0, 255, 136, 0.1);
@@ -1350,44 +1037,7 @@
       font-size: 12px;
       font-weight: 600;
     }
-    
-    .video-footer {
-      text-align: center;
-      padding-top: 20px;
-      border-top: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    
-    .video-footer p {
-      color: #aaa;
-      margin-bottom: 15px;
-      font-size: 14px;
-    }
-    
-    .video-footer i {
-      color: #00ff88;
-      margin-right: 8px;
-    }
-    
-    .btn-telegram {
-      padding: 12px 25px;
-      background: linear-gradient(135deg, #0088cc, #006699);
-      color: white;
-      border: none;
-      border-radius: 30px;
-      font-weight: 600;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      transition: all 0.3s;
-    }
-    
-    .btn-telegram:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 10px 20px rgba(0, 136, 204, 0.3);
-    }
-    
-    /* ভিডিও প্লেয়ার মোডাল */
+    /* ভিডিও প্লেয়ার - বড় টিভি স্টাইল */
     .video-player-modal {
       position: fixed;
       top: 0;
@@ -1404,8 +1054,8 @@
     
     .video-player-container {
       width: 100%;
-      max-width: 800px;
-      height: 70vh;
+      max-width: 900px;
+      height: 80vh;
       position: relative;
       border-radius: 15px;
       overflow: hidden;
@@ -1443,98 +1093,10 @@
       border: none;
     }
     
-    /* ফুটার */
-    .footer {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      right: 0;
-      background: rgba(10, 10, 15, 0.95);
-      border-top: 2px solid #00ff88;
-      padding: 18px 20px;
-      text-align: center;
-      z-index: 999;
-      backdrop-filter: blur(10px);
-    }
-    
-    .developer-credit {
-      color: #aaa;
-      font-size: 15px;
-    }
-    
-    .developer-credit strong {
-      color: #00ff88;
-      font-weight: 700;
-    }
-    
-    .developer-credit a {
-      color: #00ccff;
-      text-decoration: none;
-      font-weight: 700;
-      margin: 0 8px;
-      transition: all 0.3s;
-    }
-    
-    .developer-credit a:hover {
-      color: #00ff88;
-      text-shadow: 0 0 15px rgba(0, 255, 136, 0.7);
-    }
-    
-    .version {
-      color: #00ff88;
-      margin-left: 15px;
-      font-weight: 600;
-      background: rgba(0, 255, 136, 0.1);
-      padding: 4px 12px;
-      border-radius: 20px;
-      font-size: 14px;
-    }
-    
     /* রেস্পন্সিভ */
     @media (max-width: 600px) {
       .container {
         padding: 80px 15px 120px;
-      }
-      
-      .card {
-        padding: 25px 20px;
-        margin: 15px 0;
-      }
-      
-      .button-grid {
-        gap: 12px;
-      }
-      
-      .app-button {
-        min-height: 100px;
-        padding: 15px 10px;
-      }
-      
-      .app-button i {
-        font-size: 24px;
-        margin-bottom: 10px;
-      }
-      
-      .balance-amount {
-        font-size: 42px;
-      }
-      
-      .header {
-        padding: 12px 15px;
-      }
-      
-      .logo-title {
-        font-size: 20px;
-      }
-      
-      .logo-img {
-        width: 40px;
-        height: 40px;
-      }
-      
-      .header-user {
-        font-size: 14px;
-        padding: 6px 12px;
       }
       
       .video-grid {
@@ -1542,39 +1104,23 @@
       }
       
       .video-thumbnail {
-        height: 160px;
+        height: 180px;
       }
       
       .video-player-container {
-        height: 50vh;
-      }
-    }
-    
-    @media (max-width: 400px) {
-      .button-grid {
-        grid-template-columns: 1fr;
+        height: 60vh;
       }
       
       .balance-amount {
-        font-size: 36px;
-      }
-      
-      .app-button {
-        min-height: 90px;
-      }
-      
-      .header-user span {
-        display: none;
+        font-size: 42px;
       }
     }
   </style>
 </head>
 <body>
-  <!-- হেডার -->
   <div class="header">
     <div class="logo">
-      <!-- এখানে আপনার লোগো লিংক দিন -->
-      <img src="https://uploads.onecompiler.io/42weeh2u8/447u2x33g/1000028376.jpg" alt="Honesty Earning Logo" class="logo-img" id="logoImg" onerror="this.style.display='none'; document.getElementById('logoIcon').style.display='block';">
+      <img src="https://uploads.onecompiler.io/42weeh2u8/447u2x33g/1000028376.jpg" alt="Honesty Earning Logo" class="logo-img" id="logoImg">
       <div class="logo-icon" id="logoIcon">💎</div>
       <div class="logo-text">
         <div class="logo-title">Honesty Earning</div>
@@ -1587,25 +1133,21 @@
     </div>
   </div>
 
-  <!-- লোডার -->
   <div id="loader" class="loader hidden">
     <div class="loader-spinner"></div>
     <div class="loader-text">লোড হচ্ছে...</div>
   </div>
 
-  <!-- টোস্ট -->
   <div id="toast" class="toast hidden"></div>
 
   <div class="container">
-    <!-- অথেন্টিকেশন -->
     <div id="authPages">
       <div id="loginPage" class="card">
         <div class="page-title" id="pageTitle"><i class="fas fa-sign-in-alt"></i> লগইন</div>
         <input type="email" id="loginEmail" placeholder="ইমেইল এড্রেস" />
         <input type="password" id="loginPass" placeholder="পাসওয়ার্ড" />
         <button class="btn" onclick="login()">
-          <i class="fas fa-sign-in-alt"></i>
-          লগইন করুন
+          <i class="fas fa-sign-in-alt"></i> লগইন করুন
         </button>
         <div class="link" onclick="showRegisterPage()">নতুন একাউন্ট? রেজিস্টার করুন</div>
       </div>
@@ -1617,14 +1159,12 @@
         <input type="tel" id="regPhone" placeholder="ফোন নম্বর (01XXXXXXXXX)" />
         <input type="password" id="regPass" placeholder="পাসওয়ার্ড (৬ অক্ষরের বেশি)" />
         <button class="btn" onclick="register()">
-          <i class="fas fa-user-plus"></i>
-          একাউন্ট তৈরি করুন
+          <i class="fas fa-user-plus"></i> একাউন্ট তৈরি করুন
         </button>
         <div class="link" onclick="showLoginPage()">ইতিমধ্যে একাউন্ট আছে? লগইন করুন</div>
       </div>
     </div>
 
-    <!-- ইউজার ড্যাশবোর্ড -->
     <div id="userHome" class="card hidden">
       <div class="user-info">
         <div class="info-item">
@@ -1644,10 +1184,9 @@
       <div class="balance-container">
         <div class="balance-label">আপনার ব্যালেন্স</div>
         <div class="balance-amount" id="userBalance">৳ <span class="balance-amount">0</span></div>
-        <div class="balance-note">ন্যূনতম উইথড্র: ৳১০০</div>
+        <div class="balance-note">ন্যূনতম উইথড্র: ৳২০</div>
       </div>
       
-      <!-- বাটন গ্রিড -->
       <div class="button-grid">
         <button class="app-button button-primary" onclick="openWithdrawModal()" id="withdrawBtn">
           <i class="fas fa-money-bill-wave"></i>
@@ -1671,15 +1210,12 @@
       </div>
       
       <button class="btn btn-danger" onclick="logout()">
-        <i class="fas fa-sign-out-alt"></i>
-        লগআউট
+        <i class="fas fa-sign-out-alt"></i> লগআউট
       </button>
 
-      <!-- হিস্টরি -->
       <div id="historyList" class="history-container hidden"></div>
     </div>
 
-    <!-- উইথড্র মোডাল -->
     <div id="withdrawModal" class="modal-overlay hidden">
       <div class="modal-content">
         <div class="modal-header">
@@ -1705,21 +1241,19 @@
         
         <div class="form-group">
           <label class="form-label"><i class="fas fa-coins"></i> টাকার পরিমাণ</label>
-          <input type="number" id="withdrawAmount" placeholder="৳ 100" min="100" />
+          <input type="number" id="withdrawAmount" placeholder="৳ 20" min="20" />
           <div class="form-note">
             <i class="fas fa-wallet"></i> বর্তমান: <span id="currentBalance">0</span> টাকা<br>
-            <span class="min-amount"><i class="fas fa-exclamation-circle"></i> ন্যূনতম: ৳১০০</span>
+            <span class="min-amount"><i class="fas fa-exclamation-circle"></i> ন্যূনতম: ৳২০</span>
           </div>
         </div>
         
         <button class="btn" onclick="submitWithdraw()">
-          <i class="fas fa-paper-plane"></i>
-          সাবমিট করুন
+          <i class="fas fa-paper-plane"></i> সাবমিট করুন
         </button>
       </div>
     </div>
 
-    <!-- ভিডিও গ্যালারি মোডাল -->
     <div id="videoGalleryModal" class="modal-overlay hidden">
       <div class="modal-content" style="max-width: 95%;">
         <div class="modal-header">
@@ -1727,7 +1261,6 @@
           <button class="close-btn" onclick="closeVideoGallery()">×</button>
         </div>
         
-        <!-- ভিডিও ক্যাটাগরি -->
         <div class="video-categories">
           <button class="category-btn active" onclick="filterVideos('all')">সব ভিডিও</button>
           <button class="category-btn" onclick="filterVideos('tutorial')">টিউটোরিয়াল</button>
@@ -1735,12 +1268,8 @@
           <button class="category-btn" onclick="filterVideos('success')">সাকসেস স্টোরি</button>
         </div>
         
-        <!-- ভিডিও গ্রিড -->
-        <div class="video-grid" id="videoGrid">
-          <!-- ভিডিওগুলো ডাইনামিক্যালি লোড হবে -->
-        </div>
+        <div class="video-grid" id="videoGrid"></div>
         
-        <!-- নিচের লিংক -->
         <div class="video-footer">
           <p><i class="fas fa-info-circle"></i> আরো ভিডিও পেতে আমাদের টেলিগ্রাম চ্যানেল জয়েন করুন</p>
           <button class="btn-telegram" onclick="openSupport()">
@@ -1750,24 +1279,14 @@
       </div>
     </div>
 
-    <!-- ভিডিও প্লেয়ার মোডাল -->
     <div id="videoPlayer" class="video-player-modal hidden">
       <div class="video-player-container">
         <button class="close-player-btn" onclick="closeVideoPlayer()">
           <i class="fas fa-times"></i>
         </button>
-        <iframe 
-          id="videoFrame" 
-          width="100%" 
-          height="100%" 
-          src="" 
-          frameborder="0" 
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" 
-          allowfullscreen>
-        </iframe>
+        <iframe id="videoFrame" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
       </div>
     </div>
-  </div>
   </div>
 </body>
 </html>
