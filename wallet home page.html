@@ -1114,6 +1114,74 @@
       .balance-amount {
         font-size: 42px;
       }
+          /* ফুটার - মিনিমাল, চিকন এবং তোমার ডার্ক থিমের সাথে ম্যাচিং */
+    .footer {
+      position: fixed;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      background: rgba(10, 10, 15, 0.95); /* তোমার হেডারের মতো ডার্ক */
+      border-top: 1px solid rgba(0, 255, 136, 0.4); /* হালকা গ্রিন বর্ডার */
+      padding: 12px 20px; /* চিকন করার জন্য কম প্যাডিং */
+      text-align: center;
+      z-index: 999;
+      backdrop-filter: blur(10px); /* তোমার হেডারের মতো ব্লার ইফেক্ট */
+      box-shadow: 0 -4px 20px rgba(0, 255, 136, 0.08);
+      height: 48px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .developer-credit {
+      color: #aaa; /* লাইট গ্রে – ডার্কে ভালো দেখায় */
+      font-size: 13.5px; /* তোমার দেওয়া 14px এর কাছাকাছি, কিন্তু চিকন ফিল */
+      font-weight: 500;
+    }
+    
+    .developer-credit strong {
+      color: #00ff88; /* তোমার প্রাইমারি গ্রিন */
+      font-weight: 700;
+    }
+    
+    .developer-credit a {
+      color: #00ccff; /* সায়ান – তোমার গ্রেডিয়েন্টের সেকেন্ড কালার */
+      text-decoration: none;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+    
+    .developer-credit a:hover {
+      color: #00ff88;
+      text-shadow: 0 0 10px rgba(0, 255, 136, 0.5);
+      /* underline না দিয়ে গ্লো ইফেক্ট – তোমার থিমের সাথে বেশি ম্যাচ করে */
+    }
+    
+    .version {
+      color: #00ff88;
+      font-weight: 600;
+      background: rgba(0, 255, 136, 0.1);
+      padding: 3px 10px;
+      border-radius: 15px;
+      font-size: 12px;
+      margin-left: 12px;
+    }
+    
+    /* মোবাইলে আরো চিকন */
+    @media (max-width: 600px) {
+      .footer {
+        padding: 10px 15px;
+        height: 45px;
+      }
+      .developer-credit {
+        font-size: 13px;
+      }
+      .version {
+        margin-left: 8px;
+        font-size: 11.5px;
+        padding: 3px 8px;
+      }
+    }
     }
   </style>
 </head>
@@ -1286,6 +1354,12 @@
         </button>
         <iframe id="videoFrame" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
       </div>
+    </div>
+      <!-- ফুটার -->
+  <div class="footer">
+    <div class="developer-credit">
+      Developed by <a href="#" target="_blank">Abdullah Khan</a> 
+      • v1.0.1
     </div>
   </div>
 </body>
