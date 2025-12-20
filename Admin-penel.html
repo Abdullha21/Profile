@@ -14,7 +14,7 @@
         }
 
         body {
-            background: linear-gradient(135deg, #0f0c29 0%, #302b63 50%, #24243e 100%);
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 50%, #0a0a0a 100%);
             color: #ffffff;
             min-height: 100vh;
             position: relative;
@@ -28,179 +28,120 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: radial-gradient(circle at 20% 50%, rgba(41, 196, 255, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 80% 20%, rgba(255, 41, 117, 0.1) 0%, transparent 50%),
-                        radial-gradient(circle at 40% 80%, rgba(41, 255, 198, 0.1) 0%, transparent 50%);
-            z-index: -1;
-            animation: gradientShift 15s ease-in-out infinite alternate;
-        }
-
-        @keyframes gradientShift {
-            0% { opacity: 0.5; transform: scale(1); }
-            100% { opacity: 0.8; transform: scale(1.1); }
-        }
-
-        .floating-particles {
-            position: fixed;
-            width: 100%;
-            height: 100%;
+            background: 
+                radial-gradient(circle at 10% 20%, rgba(0, 255, 136, 0.15) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(0, 200, 255, 0.1) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(255, 0, 255, 0.05) 0%, transparent 60%);
+            z-index: -2;
             pointer-events: none;
-            z-index: -1;
         }
 
-        .particle {
-            position: absolute;
-            width: 4px;
-            height: 4px;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            animation: float 15s infinite linear;
-        }
-
-        @keyframes float {
-            0% { transform: translateY(100vh) rotate(0deg); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(-100px) rotate(360deg); opacity: 0; }
-        }
-
-        /* Header Styles */
         .header {
-            background: linear-gradient(90deg, rgba(15, 12, 41, 0.9) 0%, rgba(48, 43, 99, 0.9) 100%);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 25px 40px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            position: sticky;
+            position: fixed;
             top: 0;
-            z-index: 100;
-            animation: slideDown 0.6s ease-out;
-        }
-
-        @keyframes slideDown {
-            from { transform: translateY(-100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .header h1 {
-            background: linear-gradient(90deg, #29c4ff 0%, #ff2975 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 32px;
-            font-weight: 800;
+            left: 0;
+            right: 0;
+            background: rgba(10, 10, 10, 0.95);
+            backdrop-filter: blur(10px);
+            z-index: 1000;
+            padding: 15px 20px;
             display: flex;
             align-items: center;
-            gap: 15px;
+            justify-content: space-between;
+            border-bottom: 2px solid #00ff88;
+            box-shadow: 0 5px 30px rgba(0, 255, 136, 0.2);
         }
-
-        .header h1::before {
-            content: '⚡';
-            font-size: 40px;
-            animation: pulse 2s infinite;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.2); }
-            100% { transform: scale(1); }
+        
+        .header h1 {
+            font-size: 22px;
+            font-weight: 800;
+            background: linear-gradient(90deg, #00ff88, #00ccff);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            letter-spacing: 0.5px;
+            text-shadow: 0 2px 10px rgba(0, 255, 136, 0.3);
         }
 
         .stats-bar {
             display: flex;
-            gap: 30px;
+            gap: 15px;
         }
 
         .stat-item {
             text-align: center;
-            padding: 10px 25px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(5px);
+            padding: 8px 15px;
+            background: rgba(0, 255, 136, 0.1);
+            border-radius: 50px;
+            border: 1px solid rgba(0, 255, 136, 0.3);
             transition: all 0.3s ease;
         }
 
-        .stat-item:hover {
-            transform: translateY(-5px);
-            background: rgba(255, 255, 255, 0.1);
-            border-color: rgba(41, 196, 255, 0.5);
-            box-shadow: 0 10px 20px rgba(41, 196, 255, 0.2);
-        }
-
         .stat-value {
-            font-size: 28px;
+            font-size: 20px;
             font-weight: 700;
-            color: #29c4ff;
-            text-shadow: 0 0 20px rgba(41, 196, 255, 0.5);
+            color: #00ff88;
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
         }
 
         .stat-label {
-            font-size: 12px;
-            color: rgba(255, 255, 255, 0.7);
+            font-size: 11px;
+            color: #aaa;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-top: 5px;
+            letter-spacing: 0.5px;
+            margin-top: 3px;
         }
 
-        /* Main Container */
-        .container {
-            max-width: 1400px;
-            margin: 30px auto;
-            padding: 0 20px;
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 30px;
+        .container { 
+            max-width: 1200px; 
+            margin: 80px auto 60px; 
+            padding: 0 20px; 
         }
 
-        /* Navigation Tabs */
         .nav-tabs {
             display: flex;
             gap: 10px;
-            background: rgba(15, 12, 41, 0.8);
+            background: rgba(20, 20, 30, 0.85);
             padding: 10px;
             border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
             backdrop-filter: blur(10px);
-            margin-bottom: 20px;
+            margin-bottom: 25px;
         }
 
         .tab-btn {
             flex: 1;
-            padding: 18px 30px;
+            padding: 15px 20px;
             background: transparent;
             border: 1px solid transparent;
             border-radius: 12px;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 16px;
+            color: #aaa;
+            font-size: 14px;
             font-weight: 600;
             cursor: pointer;
             transition: all 0.3s ease;
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
+            gap: 8px;
         }
 
         .tab-btn:hover {
-            background: rgba(255, 255, 255, 0.05);
+            background: rgba(0, 255, 136, 0.15);
             color: #ffffff;
         }
 
         .tab-btn.active {
-            background: linear-gradient(135deg, rgba(41, 196, 255, 0.2) 0%, rgba(255, 41, 117, 0.2) 100%);
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.2), rgba(0, 204, 255, 0.2));
             color: #ffffff;
-            border-color: rgba(41, 196, 255, 0.3);
-            box-shadow: 0 5px 20px rgba(41, 196, 255, 0.2);
+            border-color: rgba(0, 255, 136, 0.3);
+            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.2);
         }
 
         .tab-btn i {
-            font-size: 20px;
+            font-size: 18px;
         }
 
-        /* Tab Content */
         .tab-content {
             display: none;
             animation: fadeIn 0.5s ease;
@@ -215,67 +156,44 @@
             display: block;
         }
 
-        /* Card Styles */
         .section-title {
-            font-size: 24px;
+            font-size: 22px;
             font-weight: 700;
-            color: #ffffff;
-            margin-bottom: 25px;
-            padding-left: 15px;
-            border-left: 5px solid #29c4ff;
+            color: #00ff88;
+            margin-bottom: 20px;
             display: flex;
             align-items: center;
-            gap: 12px;
-        }
-
-        .card-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-            gap: 25px;
-            margin-bottom: 30px;
+            gap: 10px;
         }
 
         .card {
-            background: linear-gradient(135deg, rgba(15, 12, 41, 0.9) 0%, rgba(48, 43, 99, 0.9) 100%);
+            background: rgba(20, 20, 30, 0.85);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(0, 255, 136, 0.3);
             border-radius: 20px;
             padding: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-            transition: all 0.4s ease;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 5px;
-            background: linear-gradient(90deg, #29c4ff 0%, #ff2975 100%);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), 0 0 30px rgba(0, 255, 136, 0.1);
+            transition: all 0.3s;
         }
 
         .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 25px 50px rgba(41, 196, 255, 0.15);
-            border-color: rgba(41, 196, 255, 0.3);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.6), 0 0 40px rgba(0, 255, 136, 0.2);
         }
 
         .user-item {
             padding: 20px;
             margin-bottom: 15px;
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(30, 30, 40, 0.7);
             border-radius: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             transition: all 0.3s ease;
         }
 
         .user-item:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(41, 196, 255, 0.2);
-            transform: translateX(5px);
+            background: rgba(40, 40, 50, 0.9);
+            border-color: rgba(0, 255, 136, 0.3);
+            transform: translateY(-5px);
         }
 
         .user-info {
@@ -283,10 +201,13 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .user-details {
             flex: 1;
+            min-width: 200px;
         }
 
         .user-name {
@@ -297,44 +218,67 @@
         }
 
         .user-contact {
-            color: rgba(255, 255, 255, 0.7);
+            color: #aaa;
             font-size: 14px;
             display: flex;
             align-items: center;
             gap: 15px;
+            flex-wrap: wrap;
         }
 
         .user-balance {
             font-size: 22px;
             font-weight: 700;
-            color: #29ffa5;
-            text-shadow: 0 0 15px rgba(41, 255, 165, 0.3);
+            color: #00ff88;
+            text-shadow: 0 0 15px rgba(0, 255, 136, 0.5);
+            min-width: 100px;
+            text-align: right;
         }
 
         .balance-control {
             display: flex;
             gap: 10px;
             margin-top: 15px;
+            align-items: center;
+            flex-wrap: wrap;
         }
 
         .balance-input {
             flex: 1;
             padding: 12px 20px;
-            background: rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(41, 196, 255, 0.3);
-            border-radius: 10px;
-            color: #ffffff;
+            background: rgba(40, 40, 50, 0.8);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 12px;
+            color: #fff;
             font-size: 16px;
-            transition: all 0.3s ease;
+            transition: all 0.3s;
+            min-width: 150px;
         }
 
         .balance-input:focus {
             outline: none;
-            border-color: #29c4ff;
-            box-shadow: 0 0 0 3px rgba(41, 196, 255, 0.2);
+            border-color: #00ff88;
+            box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.2);
         }
 
-        /* Button Styles */
+        .reason-input {
+            flex: 2;
+            padding: 12px 20px;
+            background: rgba(40, 40, 50, 0.8);
+            border: 1px solid rgba(0, 255, 136, 0.3);
+            border-radius: 12px;
+            color: #fff;
+            font-size: 16px;
+            transition: all 0.3s;
+            min-width: 200px;
+        }
+
+        .reason-input:focus {
+            outline: none;
+            border-color: #00ff88;
+            box-shadow: 0 0 0 3px rgba(0, 255, 136, 0.2);
+        }
+
         .btn {
             padding: 12px 28px;
             border: none;
@@ -350,37 +294,26 @@
             min-width: 120px;
         }
 
-        .btn-primary {
-            background: linear-gradient(135deg, #29c4ff 0%, #2982ff 100%);
-            color: white;
-            box-shadow: 0 5px 20px rgba(41, 196, 255, 0.3);
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(41, 196, 255, 0.4);
-        }
-
         .btn-success {
-            background: linear-gradient(135deg, #00d68f 0%, #00b478 100%);
-            color: white;
-            box-shadow: 0 5px 20px rgba(0, 214, 143, 0.3);
+            background: linear-gradient(135deg, #00ff88 0%, #00cc66 100%);
+            color: #000;
+            box-shadow: 0 5px 20px rgba(0, 255, 136, 0.3);
         }
 
         .btn-success:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(0, 214, 143, 0.4);
+            box-shadow: 0 10px 30px rgba(0, 255, 136, 0.4);
         }
 
         .btn-danger {
-            background: linear-gradient(135deg, #ff3d71 0%, #db2c66 100%);
+            background: linear-gradient(135deg, #ff4444 0%, #cc0000 100%);
             color: white;
-            box-shadow: 0 5px 20px rgba(255, 61, 113, 0.3);
+            box-shadow: 0 5px 20px rgba(255, 68, 68, 0.3);
         }
 
         .btn-danger:hover {
             transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(255, 61, 113, 0.4);
+            box-shadow: 0 10px 30px rgba(255, 68, 68, 0.4);
         }
 
         .btn-small {
@@ -389,57 +322,18 @@
             min-width: auto;
         }
 
-        /* Payment Methods */
-        .payment-methods {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-top: 20px;
-        }
-
-        .payment-card {
-            background: linear-gradient(135deg, rgba(15, 12, 41, 0.8) 0%, rgba(48, 43, 99, 0.8) 100%);
-            border-radius: 15px;
-            padding: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-
-        .payment-card:hover {
-            border-color: rgba(41, 196, 255, 0.5);
-            box-shadow: 0 10px 30px rgba(41, 196, 255, 0.2);
-        }
-
-        .payment-icon {
-            font-size: 40px;
-            margin-bottom: 15px;
-            background: linear-gradient(135deg, #29c4ff, #2982ff);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .payment-number {
-            font-size: 22px;
-            font-weight: 600;
-            color: #ffffff;
-            margin: 10px 0;
-            letter-spacing: 1px;
-        }
-
-        /* History Items */
         .history-item {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(30, 30, 40, 0.7);
             border-radius: 15px;
             padding: 20px;
             margin-bottom: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
         }
 
         .history-item:hover {
-            background: rgba(255, 255, 255, 0.06);
-            border-color: rgba(41, 196, 255, 0.2);
+            background: rgba(40, 40, 50, 0.9);
+            border-color: rgba(0, 255, 136, 0.3);
         }
 
         .history-header {
@@ -447,27 +341,32 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
+            flex-wrap: wrap;
+            gap: 10px;
         }
 
         .history-user {
             font-size: 18px;
             font-weight: 600;
             color: #ffffff;
+            min-width: 150px;
         }
 
         .history-amount {
             font-size: 22px;
             font-weight: 700;
-            color: #ffaa29;
-            text-shadow: 0 0 15px rgba(255, 170, 41, 0.3);
+            color: #ffaa00;
+            text-shadow: 0 0 15px rgba(255, 170, 0, 0.3);
+            min-width: 100px;
+            text-align: right;
         }
 
         .history-details {
-            color: rgba(255, 255, 255, 0.7);
+            color: #aaa;
             font-size: 14px;
             margin-bottom: 10px;
             display: flex;
-            gap: 20px;
+            gap: 15px;
             flex-wrap: wrap;
         }
 
@@ -482,43 +381,42 @@
         }
 
         .status-pending {
-            background: rgba(255, 170, 41, 0.2);
-            color: #ffaa29;
-            border: 1px solid rgba(255, 170, 41, 0.3);
+            background: rgba(255, 170, 0, 0.2);
+            color: #ffaa00;
+            border: 1px solid rgba(255, 170, 0, 0.3);
         }
 
         .status-approved {
-            background: rgba(0, 214, 143, 0.2);
-            color: #00d68f;
-            border: 1px solid rgba(0, 214, 143, 0.3);
+            background: rgba(0, 255, 136, 0.2);
+            color: #00ff88;
+            border: 1px solid rgba(0, 255, 136, 0.3);
         }
 
         .status-cancelled {
-            background: rgba(255, 61, 113, 0.2);
-            color: #ff3d71;
-            border: 1px solid rgba(255, 61, 113, 0.3);
+            background: rgba(255, 68, 68, 0.2);
+            color: #ff4444;
+            border: 1px solid rgba(255, 68, 68, 0.3);
         }
 
-        /* Total Amount */
         .total-amount {
             text-align: center;
             padding: 30px;
-            background: linear-gradient(135deg, rgba(15, 12, 41, 0.9) 0%, rgba(48, 43, 99, 0.9) 100%);
+            background: rgba(20, 20, 30, 0.85);
             border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 255, 136, 0.3);
             margin-top: 30px;
             backdrop-filter: blur(10px);
             animation: glow 3s infinite alternate;
         }
 
         @keyframes glow {
-            0% { box-shadow: 0 0 30px rgba(255, 170, 41, 0.1); }
-            100% { box-shadow: 0 0 50px rgba(255, 170, 41, 0.3); }
+            0% { box-shadow: 0 0 30px rgba(0, 255, 136, 0.1); }
+            100% { box-shadow: 0 0 50px rgba(0, 255, 136, 0.3); }
         }
 
         .total-label {
             font-size: 16px;
-            color: rgba(255, 255, 255, 0.7);
+            color: #aaa;
             text-transform: uppercase;
             letter-spacing: 2px;
             margin-bottom: 10px;
@@ -527,154 +425,81 @@
         .total-value {
             font-size: 48px;
             font-weight: 800;
-            background: linear-gradient(90deg, #ffaa29 0%, #ff6b29 100%);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-shadow: 0 0 30px rgba(255, 170, 41, 0.5);
+            color: #00ff88;
+            text-shadow: 0 0 30px rgba(0, 255, 136, 0.5);
         }
 
-        /* Developer Credit Footer */
-        .developer-credit {
+        .footer {
             position: fixed;
             bottom: 0;
             left: 0;
             right: 0;
-            background: linear-gradient(90deg, rgba(15, 12, 41, 0.95) 0%, rgba(48, 43, 99, 0.95) 100%);
-            color: #ffffff;
+            background: rgba(10, 10, 15, 0.95);
+            border-top: 1px solid rgba(0, 255, 136, 0.4);
+            padding: 12px 20px;
             text-align: center;
-            padding: 20px;
-            border-top: 2px solid #29c4ff;
             z-index: 999;
             backdrop-filter: blur(10px);
-            animation: slideUp 0.6s ease-out;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 13.5px;
+            color: #aaa;
         }
 
-        @keyframes slideUp {
-            from { transform: translateY(100%); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        .developer-logo {
-            font-size: 28px;
-            margin-right: 12px;
-            animation: bounce 3s infinite;
-        }
-
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-
-        .developer-credit strong {
-            color: #29c4ff;
-            font-weight: 700;
-        }
-
-        .developer-credit a {
-            color: #29c4ff;
-            text-decoration: none;
-            font-weight: 700;
-            margin: 0 8px;
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .developer-credit a::after {
-            content: '';
-            position: absolute;
-            bottom: -2px;
-            left: 0;
-            width: 0;
-            height: 2px;
-            background: linear-gradient(90deg, #ff2975 0%, #ffaa29 100%);
-            transition: width 0.3s ease;
-        }
-
-        .developer-credit a:hover::after {
-            width: 100%;
-        }
-
-        .developer-credit a:hover {
-            color: #ff2975;
-            text-shadow: 0 0 15px rgba(255, 41, 117, 0.5);
-        }
-
-        .version {
-            font-size: 14px;
-            color: rgba(255, 255, 255, 0.7);
-            margin-left: 20px;
-            padding: 4px 12px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
+        .footer strong { color: #00ff88; }
+        .footer a { color: #00ccff; text-decoration: none; font-weight: 600; }
+        .footer a:hover { color: #00ff88; text-shadow: 0 0 10px rgba(0, 255, 136, 0.5); }
 
         /* Responsive Design */
-        @media (max-width: 1200px) {
-            .container {
-                grid-template-columns: 1fr;
-            }
-            
-            .card-grid {
-                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            }
-        }
-
         @media (max-width: 768px) {
             .header {
                 flex-direction: column;
-                gap: 20px;
-                padding: 20px;
+                gap: 15px;
+                padding: 15px;
             }
-            
+
+            .nav-tabs {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .tab-btn {
+                padding: 15px;
+                font-size: 16px;
+            }
+
             .stats-bar {
-                flex-wrap: wrap;
                 justify-content: center;
             }
-            
-            .tab-btn {
-                padding: 15px 20px;
-                font-size: 14px;
+
+            .user-item {
+                padding: 15px;
             }
-            
-            .nav-tabs {
-                flex-wrap: wrap;
+
+            .balance-control {
+                flex-direction: column;
+                gap: 10px;
             }
-            
-            .card-grid {
-                grid-template-columns: 1fr;
+
+            .balance-input, .reason-input {
+                width: 100%;
+                min-width: auto;
             }
-            
+
+            .history-details {
+                flex-direction: column;
+                gap: 5px;
+            }
+
             .total-value {
                 font-size: 36px;
             }
         }
-
-        @media (max-width: 480px) {
-            .header h1 {
-                font-size: 24px;
-            }
-            
-            .stat-item {
-                padding: 8px 15px;
-            }
-            
-            .stat-value {
-                font-size: 20px;
-            }
-            
-            .developer-credit {
-                font-size: 14px;
-                padding: 15px;
-            }
-        }
     </style>
-  </head>
+</head>
 <body>
-    <!-- Floating Particles -->
-    <div class="floating-particles" id="particles"></div>
-
-    <!-- Header -->
     <div class="header">
         <h1>Honesty Earning-Admin Panel</h1>
         <div class="stats-bar">
@@ -693,22 +518,19 @@
         </div>
     </div>
 
-    <!-- Main Container -->
     <div class="container">
-        <!-- Navigation Tabs -->
         <div class="nav-tabs">
             <button class="tab-btn active" onclick="switchTab('users')">
                 <i>👥</i> Users Control
             </button>
-            <button class="tab-btn" onclick="switchTab('transactions')">
-                <i>💳</i> Transactions
-            </button>
             <button class="tab-btn" onclick="switchTab('pending')">
                 <i>⏳</i> Pending Orders
             </button>
+            <button class="tab-btn" onclick="switchTab('transactions')">
+                <i>💳</i> Transactions
+            </button>
         </div>
 
-        <!-- Users Tab -->
         <div id="users-tab" class="tab-content active">
             <div class="section-title">
                 <i>👥</i> User Management - Balance Control
@@ -716,7 +538,13 @@
             <div class="card" id="userList"></div>
         </div>
 
-        <!-- Transactions Tab -->
+        <div id="pending-tab" class="tab-content">
+            <div class="section-title">
+                <i>⏳</i> Pending Withdrawal Requests
+            </div>
+            <div class="card" id="pendingList"></div>
+        </div>
+
         <div id="transactions-tab" class="tab-content">
             <div class="section-title">
                 <i>📊</i> Transaction History
@@ -728,53 +556,15 @@
                 <div class="total-value">৳ <span id="totalAmount">0</span></div>
             </div>
         </div>
-
-        <!-- Pending Orders Tab -->
-        <div id="pending-tab" class="tab-content">
-            <div class="section-title">
-                <i>⏳</i> Pending Withdrawal Requests
-            </div>
-            <div class="card" id="pendingList"></div>
-        </div>
-
-        <!-- Payment Settings Tab -->
-        <div id="payment-tab" class="tab-content">
-            <div class="section-title">
-                <i>⚙️</i> Payment Method Settings
-            </div>
-            <div class="card">
-                <h3 style="margin-bottom: 25px; color: #29c4ff;">Update Payment Numbers</h3>
-                <div class="payment-methods">
-                    <div class="payment-card">
-                        <div class="payment-icon">bKash</div>
-                        <div class="payment-number" id="currentBkash">Loading...</div>
-                        <button class="btn btn-primary" onclick="changeBkash()" style="margin-top: 15px;">
-                            <i>✏️</i> Change bKash Number
-                        </button>
-                    </div>
-                    <div class="payment-card">
-                        <div class="payment-icon">Nagad</div>
-                        <div class="payment-number" id="currentNagad">Loading...</div>
-                        <button class="btn btn-primary" onclick="changeNagad()" style="margin-top: 15px;">
-                            <i>✏️</i> Change Nagad Number
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
     </div>
 
-    <!-- Developer Credit Footer -->
-    <div class="developer-credit">
-        <span class="developer-logo">🚀</span>
-        <strong>Developed by</strong> 
-        <a href="https://t.me/abdullha2" target="_blank">Abdullah Khan</a>
-        <span class="version">v2.0.1</span>
+    <div class="footer">
+        Developed with ❤️ by <strong>Abdullah Khan</strong> | <a href="https://t.me/abdullha2" target="_blank">Telegram</a>
     </div>
 
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-        import { getFirestore, doc, updateDoc, setDoc, collection, onSnapshot, query, where, runTransaction, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+        import { getFirestore, doc, updateDoc, collection, onSnapshot, query, where, runTransaction, orderBy } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
         const firebaseConfig = {
             apiKey: "AIzaSyBdCCgNbbBhdy13VlfBDyLz5mf0Cug0Yhk",
@@ -789,64 +579,12 @@
         const app = initializeApp(firebaseConfig);
         const db = getFirestore(app);
 
-        // Initialize payment settings
-        setDoc(doc(db, 'adminSettings', 'payment'), { 
-            bkash: '017xxxxxxxxx', 
-            nagad: '018xxxxxxxxx' 
-        }, { merge: true });
-
         // Tab switching function
         window.switchTab = (tabName) => {
-            // Remove active class from all tabs
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.classList.remove('active');
-            });
-            
-            // Remove active class from all tab contents
-            document.querySelectorAll('.tab-content').forEach(content => {
-                content.classList.remove('active');
-            });
-            
-            // Add active class to clicked tab
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
             event.target.classList.add('active');
-            
-            // Show corresponding tab content
             document.getElementById(`${tabName}-tab`).classList.add('active');
-        };
-
-        // Create floating particles
-        function createParticles() {
-            const particlesContainer = document.getElementById('particles');
-            for (let i = 0; i < 50; i++) {
-                const particle = document.createElement('div');
-                particle.className = 'particle';
-                particle.style.left = `${Math.random() * 100}%`;
-                particle.style.width = `${Math.random() * 6 + 2}px`;
-                particle.style.height = particle.style.width;
-                particle.style.background = `rgba(41, 196, 255, ${Math.random() * 0.3})`;
-                particle.style.animationDelay = `${Math.random() * 15}s`;
-                particle.style.animationDuration = `${Math.random() * 10 + 10}s`;
-                particlesContainer.appendChild(particle);
-            }
-        }
-
-        createParticles();
-
-        // Payment methods functions
-        window.changeBkash = async () => {
-            const num = prompt('Enter new bKash number:');
-            if (num && num.trim()) {
-                await updateDoc(doc(db, 'adminSettings', 'payment'), { bkash: num.trim() });
-                showNotification('bKash number updated successfully!', 'success');
-            }
-        };
-
-        window.changeNagad = async () => {
-            const num = prompt('Enter new Nagad number:');
-            if (num && num.trim()) {
-                await updateDoc(doc(db, 'adminSettings', 'payment'), { nagad: num.trim() });
-                showNotification('Nagad number updated successfully!', 'success');
-            }
         };
 
         // Statistics tracking
@@ -856,24 +594,15 @@
 
         // Load admin panel data
         function loadAdminPanel() {
-            // Listen to payment settings
-            onSnapshot(doc(db, 'adminSettings', 'payment'), (snap) => {
-                if (snap.exists()) {
-                    const data = snap.data();
-                    document.getElementById('currentBkash').textContent = data.bkash || 'Not Set';
-                    document.getElementById('currentNagad').textContent = data.nagad || 'Not Set';
-                }
-            });
-
             // Listen to all users
             onSnapshot(collection(db, 'users'), (snapshot) => {
                 const list = document.getElementById('userList');
-                list.innerHTML = '<div class="card-grid">';
+                list.innerHTML = '';
                 totalUsers = snapshot.size;
                 document.getElementById('totalUsers').textContent = totalUsers;
                 
                 if (snapshot.empty) {
-                    list.innerHTML += '<p style="text-align: center; color: rgba(255,255,255,0.5); padding: 40px;">No users found</p>';
+                    list.innerHTML = '<p style="text-align: center; color: #aaa; padding: 40px;">No users found</p>';
                 }
                 
                 snapshot.forEach(docSnap => {
@@ -897,27 +626,41 @@
                                 <input type="number" 
                                        id="bal_${uid}" 
                                        class="balance-input" 
-                                       placeholder="Enter new balance"
+                                       placeholder="Enter amount to add"
                                        min="0"
-                                       step="0.01">
-                                <button class="btn btn-success btn-small" onclick="setBalance('${uid}')">
-                                    <i>💳</i> Set Balance
+                                       step="1">
+                                <input type="text" 
+                                       id="reason_${uid}" 
+                                       class="reason-input" 
+                                       placeholder="Enter reason/project (e.g., Video Task)">
+                                <button class="btn btn-success btn-small" onclick="addEarnings('${uid}')">
+                                    <i>💳</i> Add Earnings
+                                </button>
+                            </div>
+                            <div class="balance-control" style="margin-top: 10px;">
+                                <input type="number" 
+                                       id="subtract_${uid}" 
+                                       class="balance-input" 
+                                       placeholder="Enter amount to subtract"
+                                       min="0"
+                                       step="1">
+                                <button class="btn btn-danger btn-small" onclick="subtractBalance('${uid}')">
+                                    <i>💸</i> Subtract Balance
                                 </button>
                             </div>
                         </div>`;
                 });
-                list.innerHTML += '</div>';
             });
 
             // Listen to pending withdrawal requests
             onSnapshot(query(collection(db, 'withdrawRequests'), where('status', '==', 'pending')), (snapshot) => {
                 const list = document.getElementById('pendingList');
-                list.innerHTML = '<div class="card-grid">';
+                list.innerHTML = '';
                 totalPending = snapshot.size;
                 document.getElementById('totalPending').textContent = totalPending;
                 
                 if (snapshot.empty) {
-                    list.innerHTML += '<p style="text-align: center; color: rgba(255,255,255,0.5); padding: 40px;">No pending requests</p>';
+                    list.innerHTML = '<p style="text-align: center; color: #aaa; padding: 40px;">No pending requests</p>';
                 }
                 
                 snapshot.forEach(docSnap => {
@@ -932,7 +675,7 @@
                                 <div class="history-amount">৳ ${d.amount}</div>
                             </div>
                             <div class="history-details">
-                                <span>📱 ${d.phone}</span>
+                                <span>✉️ ${d.email}</span>
                                 <span>🏦 ${d.method.toUpperCase()}</span>
                                 <span>🔢 ${d.number}</span>
                                 <span>📅 ${date}</span>
@@ -947,17 +690,16 @@
                             </div>
                         </div>`;
                 });
-                list.innerHTML += '</div>';
             });
 
             // Listen to all withdrawal history
             onSnapshot(query(collection(db, 'withdrawRequests'), orderBy('createdAt', 'desc')), (snapshot) => {
                 const list = document.getElementById('historyList');
-                list.innerHTML = '<div class="card-grid">';
+                list.innerHTML = '';
                 totalApproved = 0;
                 
                 if (snapshot.empty) {
-                    list.innerHTML += '<p style="text-align: center; color: rgba(255,255,255,0.5); padding: 40px;">No transaction history</p>';
+                    list.innerHTML = '<p style="text-align: center; color: #aaa; padding: 40px;">No transaction history</p>';
                 }
                 
                 snapshot.forEach(docSnap => {
@@ -980,7 +722,7 @@
                                 <div class="history-amount">৳ ${d.amount}</div>
                             </div>
                             <div class="history-details">
-                                <span>📱 ${d.phone}</span>
+                                <span>✉️ ${d.email}</span>
                                 <span>🏦 ${d.method.toUpperCase()}</span>
                                 <span>🔢 ${d.number}</span>
                                 <span>📅 ${date}</span>
@@ -988,103 +730,99 @@
                             <div class="history-status ${statusClass}">${d.status.toUpperCase()}</div>
                         </div>`;
                 });
-                list.innerHTML += '</div>';
                 
-                // Update stats
                 document.getElementById('totalAmount').textContent = totalApproved.toLocaleString();
                 document.getElementById('totalApproved').textContent = `৳ ${totalApproved.toLocaleString()}`;
             });
         }
 
-        // User balance control
-        window.setBalance = async (uid) => {
-            const input = document.getElementById(`bal_${uid}`);
-            const newBal = parseFloat(input.value);
+        // Add Earnings with amount and reason - adds to current balance and saves to history
+        window.addEarnings = async (uid) => {
+            const amountInput = document.getElementById(`bal_${uid}`);
+            const reasonInput = document.getElementById(`reason_${uid}`);
+            const addAmount = parseFloat(amountInput.value);
+            const reason = reasonInput.value.trim() || 'Admin added earnings';
             
-            if (isNaN(newBal) || newBal < 0) {
-                showNotification('Please enter a valid number', 'error');
+            if (isNaN(addAmount) || addAmount <= 0) {
+                alert('সঠিক টাকার পরিমাণ দিন!');
                 return;
             }
             
-            await updateDoc(doc(db, 'users', uid), { balance: newBal });
-            showNotification('Balance updated successfully!', 'success');
-            input.value = '';
+            if (!reason) {
+                alert('কারণ লিখুন!');
+                return;
+            }
+            
+            try {
+                await runTransaction(db, async (transaction) => {
+                    const userRef = doc(db, 'users', uid);
+                    const userSnap = await transaction.get(userRef);
+                    const current = userSnap.data()?.balance || 0;
+                    transaction.update(userRef, { balance: current + addAmount });
+                });
+                
+                // Save to earningsHistory for user app history
+                await addDoc(collection(db, 'earningsHistory'), {
+                    userId: uid,
+                    amount: addAmount,
+                    reason: reason,
+                    createdAt: serverTimestamp()
+                });
+                
+                alert('ইনকাম সফলভাবে যোগ করা হয়েছে!');
+                amountInput.value = '';
+                reasonInput.value = '';
+            } catch (error) {
+                alert('ত্রুটি: ' + error.message);
+            }
         };
 
-        // Approve withdrawal request
+        // Subtract Balance
+        window.subtractBalance = async (uid) => {
+            const amountInput = document.getElementById(`subtract_${uid}`);
+            const subtractAmount = parseFloat(amountInput.value);
+            
+            if (isNaN(subtractAmount) || subtractAmount <= 0) {
+                alert('সঠিক টাকার পরিমাণ দিন!');
+                return;
+            }
+            
+            try {
+                await runTransaction(db, async (transaction) => {
+                    const userRef = doc(db, 'users', uid);
+                    const userSnap = await transaction.get(userRef);
+                    const current = userSnap.data()?.balance || 0;
+                    transaction.update(userRef, { balance: Math.max(0, current - subtractAmount) });
+                });
+                
+                alert('ব্যালেন্স সফলভাবে কাটা হয়েছে!');
+                amountInput.value = '';
+            } catch (error) {
+                alert('ত্রুটি: ' + error.message);
+            }
+        };
+
+        // Approve withdrawal request - deduct balance
         window.approve = async (reqId, amount, userId) => {
+            if (!confirm('এপ্রুভ করবেন?')) return;
             await runTransaction(db, async (t) => {
                 const snap = await t.get(doc(db, 'users', userId));
                 const current = snap.data().balance || 0;
                 t.update(doc(db, 'users', userId), { balance: current - amount });
                 t.update(doc(db, 'withdrawRequests', reqId), { status: 'approved' });
             });
-            showNotification('Request approved successfully!', 'success');
+            alert('✅ এপ্রুভ করা হয়েছে!');
         };
 
         // Cancel withdrawal request
         window.cancel = async (reqId) => {
+            if (!confirm('ক্যানসেল করবেন?')) return;
             await updateDoc(doc(db, 'withdrawRequests', reqId), { status: 'cancelled' });
-            showNotification('Request cancelled', 'warning');
+            alert('❌ ক্যানসেল করা হয়েছে');
         };
-
-        // Notification system
-        function showNotification(message, type = 'info') {
-            // Create notification element
-            const notification = document.createElement('div');
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 20px 30px;
-                background: ${type === 'success' ? 'linear-gradient(135deg, #00d68f, #00b478)' : 
-                           type === 'error' ? 'linear-gradient(135deg, #ff3d71, #db2c66)' : 
-                           type === 'warning' ? 'linear-gradient(135deg, #ffaa29, #ff6b29)' :
-                           'linear-gradient(135deg, #2982ff, #29c4ff)'};
-                color: white;
-                border-radius: 15px;
-                box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-                z-index: 10000;
-                animation: slideInRight 0.3s ease, fadeOut 0.3s ease 2.7s forwards;
-                font-weight: 600;
-                display: flex;
-                align-items: center;
-                gap: 10px;
-            `;
-            
-            let icon = 'ℹ️';
-            if (type === 'success') icon = '✅';
-            if (type === 'error') icon = '❌';
-            if (type === 'warning') icon = '⚠️';
-            
-            notification.innerHTML = `${icon} ${message}`;
-            document.body.appendChild(notification);
-            
-            // Remove after 3 seconds
-            setTimeout(() => {
-                if (notification.parentNode) {
-                    notification.remove();
-                }
-            }, 3000);
-        }
-
-        // Add notification animation styles
-        const style = document.createElement('style');
-        style.textContent = `
-            @keyframes slideInRight {
-                from { transform: translateX(100%); opacity: 0; }
-                to { transform: translateX(0); opacity: 1; }
-            }
-            @keyframes fadeOut {
-                from { opacity: 1; }
-                to { opacity: 0; }
-            }
-        `;
-        document.head.appendChild(style);
 
         // Initialize
         loadAdminPanel();
     </script>
 </body>
 </html>
-
