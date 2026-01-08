@@ -270,7 +270,7 @@
     <iframe src="https://www.youtube.com/embed/6fJ_NzykFQI" allowfullscreen></iframe>
 
     <!-- Website Branding -->
-    <a href="https://abdullha21.github.io/BUYYOURPRODUCT/index%20(4).html" target="_blank" class="website-link">
+    <a href="https://abdullha21.github.io/BUYYOURPRODUCT/" target="_blank" class="website-link">
       <img src="https://uploads.onecompiler.io/42weeh2u8/43jacqcnx/1000017904.png" alt="Website Logo" class="website-logo" />
       <div class="website-name">BUY YOUR PRODUCT</div>
     </a>
